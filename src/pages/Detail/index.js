@@ -31,7 +31,7 @@ import axios from "axios";
 import { monthDiff } from "../../utilities/calculateMonth";
 import FormUpdatePerkembanganAnak from "../../components/form/FormUpdatePerkembanganAnak";
 import Navigation from "../../components/layout/Navigation";
-import Image from 'react-bootstrap/Image';
+import Image from "react-bootstrap/Image";
 import bayi from "../../assets/img/bayi_1.png";
 import "./detail-style.css";
 import { AlignCenterOutlined } from "@ant-design/icons";
@@ -50,21 +50,12 @@ ChartJS.register(
   ...registerables
 );
 
-const BackgroundComponent = () => {
-  const backgroundStyles = {
-    position: "absolute",
-    top: 80,
-    left: -5,
-    width: "100vw",
-    height: '40%',
-    zIndex: -10000,
-    background: `url(${bg_dashboard}) no-repeat center`,
-    backgroundSize: '100vw auto',
-    borderRadius: "0 0 50px 50px",
-    boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.19)"
-  };
-  return <div style={backgroundStyles} />;
-};
+const BackgroundComponent = () => (
+  <div
+    className="absolute top-[80px] left-[-5px] w-[calc(100%+10px)] h-[40vh] min-h-[150px] sm:min-h-[200px] z-[-10000] bg-no-repeat bg-center bg-cover sm:bg-cover rounded-b-[50px] shadow-[0_10px_20px_rgba(0,0,0,0.19)]"
+    style={{ backgroundImage: `url(${bg_dashboard})` }}
+  />
+);
 
 export default function Detail() {
   let { id } = useParams();
@@ -203,7 +194,10 @@ export default function Detail() {
         let floor;
         if (data[i].tinggi - Math.floor(data[i].tinggi) === 0.5) {
           floor = data[i].tinggi;
-        } else if (data[i].tinggi - Math.floor(data[i].tinggi) === 0 || data[i].tinggi - Math.floor(data[i].tinggi) < 0.5) {
+        } else if (
+          data[i].tinggi - Math.floor(data[i].tinggi) === 0 ||
+          data[i].tinggi - Math.floor(data[i].tinggi) < 0.5
+        ) {
           floor = Math.floor(data[i].tinggi);
         } else {
           floor = Math.floor(data[i].tinggi) + 0.5;
@@ -211,57 +205,53 @@ export default function Detail() {
         dataset_gizi.push(floor);
       }
       // buatlah 60 array dari bulan "dataset"
-      console.log("test", dataset_gizi)
+      console.log("test", dataset_gizi);
       const result = [];
 
       let j = 0;
       if (dataset[0] >= 0 && dataset[0] <= 24) {
         if (dataAnak.gender === "LAKI_LAKI") {
           dataBeratTinggiBadanPria24Bulan.forEach((item) => {
-
             if (parseFloat(dataset_gizi[j]) === parseFloat(item.pb)) {
               result.push(Number(data[j].berat));
               j++;
             } else {
-              result.push(null)
+              result.push(null);
             }
-          })
+          });
         } else {
           dataBeratTinggiBadanPerempuan24Bulan.forEach((item) => {
-            
             if (parseFloat(dataset_gizi[j]) === parseFloat(item.pb)) {
               result.push(Number(data[j].berat));
               j++;
             } else {
-              result.push(null)
+              result.push(null);
             }
-          })
+          });
         }
       } else if (dataset[0] > 24 && dataset[0] <= 60) {
         if (dataAnak.gender === "LAKI_LAKI") {
           dataBeratTinggiBadanPria60Bulan.forEach((item) => {
-
             if (parseFloat(dataset_gizi[j]) === parseFloat(item.pb)) {
               result.push(Number(data[j].berat));
               j++;
             } else {
-              result.push(null)
+              result.push(null);
             }
-          })
+          });
         } else {
           dataBeratTinggiBadanPerempuan60Bulan.forEach((item) => {
-
             if (parseFloat(dataset_gizi[j]) === parseFloat(item.pb)) {
               result.push(Number(data[j].berat));
               j++;
             } else {
-              result.push(null)
+              result.push(null);
             }
-          })
+          });
         }
       }
 
-      console.log("gizi", result)
+      console.log("gizi", result);
       return result;
     }
   }
@@ -494,9 +484,6 @@ export default function Detail() {
     ],
   };
 
-
-
-
   const dataChartPriaBB = {
     labels: labels,
     datasets: [
@@ -553,9 +540,6 @@ export default function Detail() {
       },
     ],
   };
-
-
-
 
   const dataChartPerempuanBB = {
     labels: labels,
@@ -801,8 +785,6 @@ export default function Detail() {
       },
     ],
   };
-
-
 
   const optionsBB = {
     responsive: true,
@@ -1103,7 +1085,8 @@ export default function Detail() {
       title: "Status - LK/U",
       key: "statusLK",
       dataIndex: ["statistik", "lingkar_kepala"],
-    }, {
+    },
+    {
       title: "Status - Gizi",
       key: "statusGizi",
       dataIndex: ["statistik", "gizi"],
@@ -1128,7 +1111,7 @@ export default function Detail() {
     // },
   ];
 
-  const [activeContent, setActiveContent] = useState('Content 1');
+  const [activeContent, setActiveContent] = useState("Content 1");
 
   const handleButtonClick = (content) => {
     setActiveContent(content);
@@ -1138,131 +1121,142 @@ export default function Detail() {
     <>
       <Navbar isLogin />
       <BackgroundComponent />
-      <Row style={{ display: "flex", justifyContent: "center", padding: "50px" }}>
-        <Col span={24}>
-          {/* <Navigation
-            breadcrumb={[
-              {
-                title: "Dashboard",
-                link: "/dashboard",
-              },
-              {
-                title: "Detail Data Anak",
-                link: "",
-              },
-            ]}
-          /> */}
-        </Col>
-        <Col span={24}>
-          {/* <button
-            onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
-            type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-6 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+      <div className="flex flex-col items-center p-4 sm:p-6 lg:p-8 w-full justify-center">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px] items-center justify-center lg:h-[350px] h-auto mt-16">
+          <div className="flex-1 text-left">
+            <h6 className="dashboard ">{dataAnak.nama}</h6>
+            <h6 className="dashboard text-xl sm:text-2xl">{`${moment().diff(
+              moment(dataAnak.tanggal_lahir),
+              "month"
+            )} Bulan`}</h6>
+          </div>
+          <div className="flex flex-1 justify-center">
+            <Image
+              style={{ width: "150px", height: "auto" }}
+              src={bayi}
+              className="rounded"
+            />
+          </div>
+        </div>
+
+        {/* Table Section */}
+        <div className="w-full max-w-[1200px] px-4 sm:px-6 overflow-x-auto mt-20">
+          <Table
+            columns={columns}
+            dataSource={data}
+            loading={isLoading}
+            pagination={{ pageSize: 7 }}
+            className="ant-table"
+          />
+        </div>
+
+        {/* Buttons Section */}
+        <div className="flex flex-wrap gap-2 sm:gap-4 justify-center w-full max-w-[1200px] mt-4 sm:mt-6">
+          <button
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg"
+            onClick={() => handleButtonClick("Content 1")}
           >
-            Data Perkembangan Anak +
-          </button> */}
-          <Row style={{ alignItems: "center", height: "350px" }} justify={"center"} >
-            <Col span={10}>
-              <h6 className="dashboard">{dataAnak.nama}</h6>
-              <h6 className="dashboard" style={{ fontSize: "25px" }}>{`${moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan`}</h6>
-              {/* <button class="cssbuttons-io-button" onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
-                type="button" style={{ marginBottom: "20px" }}>Data Perkembangan Anak
-                <div class="icon">
-                  <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z" fill="#FF9999" />
-                  </svg>
-                </div>
-              </button> */}
-            </Col>
-            <Col >
-              <Image style={{ width: "150px" }} src={bayi} rounded />
-            </Col>
-          </Row>
+            Berat Badan
+          </button>
+          <button
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg"
+            onClick={() => handleButtonClick("Content 2")}
+          >
+            Tinggi Badan
+          </button>
+          <button
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg w-full sm:w-auto"
+            style={{ minWidth: "150px" }}
+            onClick={() => handleButtonClick("Content 3")}
+          >
+            Lingkar Kepala
+          </button>
+          <button
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg"
+            onClick={() => handleButtonClick("Content 4")}
+          >
+            Gizi
+          </button>
+        </div>
 
-
-
-
-        </Col>
-
-        <Col span={24}>
-          <Table columns={columns} dataSource={data} loading={isLoading} />
-        </Col>
-
-        <Col>
-          <button className="button_detail" onClick={() => handleButtonClick('Content 1')}>Berat Badan</button>
-          <button className="button_detail" onClick={() => handleButtonClick('Content 2')}>Tinggi badan</button>
-          <button className="button_detail" style={{ width: "190px" }} onClick={() => handleButtonClick('Content 3')}>Lingkar kepala</button>
-          <button className="button_detail" onClick={() => handleButtonClick('Content 4')}>Gizi</button>
-        </Col>
-
-        {activeContent === 'Content 1' && (
-          <Col className="mt-8 border-2 p-4 border-black" span={24}>
+        {/* Chart Sections */}
+        {activeContent === "Content 1" && (
+          <div className="w-full max-w-[1200px] mt-6 sm:mt-8 border-2 p-4 border-black">
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaBB
                   : dataChartPerempuanBB
               }
               options={optionsBB}
             />
-          </Col>
+          </div>
         )}
 
-        {activeContent === 'Content 2' && (
-          <Col className="my-8 border-2 p-4 border-black" span={24}>
+        {activeContent === "Content 2" && (
+          <div className="w-full max-w-[1200px] mt-6 sm:mt-8 border-2 p-4 border-black">
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaTB
                   : dataChartPerempuanTB
               }
               options={optionsTB}
             />
-          </Col>
+          </div>
         )}
 
-        {activeContent === 'Content 3' && (
-          <Col className="my-8 border-2 p-4 border-black" span={24}>
+        {activeContent === "Content 3" && (
+          <div className="w-full max-w-[1200px] mt-6 sm:mt-8 border-2 p-4 border-black">
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaLK
                   : dataChartPerempuanLK
               }
               options={optionsLK}
             />
-          </Col>
+          </div>
         )}
 
-        {activeContent === 'Content 4' && (
-          <Col className="my-8 border-2 p-4 border-black" span={24}>
+        {activeContent === "Content 4" && (
+          <div className="w-full max-w-[1200px] mt-6 sm:mt-8 border-2 p-4 border-black">
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
-                  ? ((moment().diff(moment(dataAnak.tanggal_lahir), "month")) >= 0 && (moment().diff(moment(dataAnak.tanggal_lahir), "month")) <= 24 ? dataChartPriaGizi_0_24 : dataChartPriaGizi_25_60)
-                  : ((moment().diff(moment(dataAnak.tanggal_lahir), "month")) >= 0 && (moment().diff(moment(dataAnak.tanggal_lahir), "month")) <= 24 ? dataChartPerempuanGizi_0_24 : dataChartPerempuanGizi_25_60)
+                dataAnak.gender === "LAKI_LAKI"
+                  ? moment().diff(moment(dataAnak.tanggal_lahir), "month") >=
+                      0 &&
+                    moment().diff(moment(dataAnak.tanggal_lahir), "month") <= 24
+                    ? dataChartPriaGizi_0_24
+                    : dataChartPriaGizi_25_60
+                  : moment().diff(moment(dataAnak.tanggal_lahir), "month") >=
+                      0 &&
+                    moment().diff(moment(dataAnak.tanggal_lahir), "month") <= 24
+                  ? dataChartPerempuanGizi_0_24
+                  : dataChartPerempuanGizi_25_60
               }
               options={optionsGizi}
             />
-          </Col>
+          </div>
         )}
-      </Row>
 
-      <FormInputPerkembanganAnak
-        isOpen={isOpenModalInputPerkembanganAnak}
-        onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
-        data={dataAnak ? dataAnak : null}
-        idAnak={id}
-        fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-      />
+        {/* Modal Forms */}
+        <FormInputPerkembanganAnak
+          isOpen={isOpenModalInputPerkembanganAnak}
+          onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
+          data={dataAnak ? dataAnak : null}
+          idAnak={id}
+          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+        />
 
-      <FormUpdatePerkembanganAnak
-        isOpen={isOpenModalUpdatePerkembanganAnak}
-        onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
-        fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-        data={dataPerkembanganAnak}
-        profil={dataAnak}
-      />
+        <FormUpdatePerkembanganAnak
+          isOpen={isOpenModalUpdatePerkembanganAnak}
+          onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
+          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+          data={dataPerkembanganAnak}
+          profil={dataAnak}
+        />
+      </div>
     </>
   );
 }

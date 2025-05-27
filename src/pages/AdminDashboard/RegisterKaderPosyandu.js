@@ -1,7 +1,7 @@
 import { Button, Col, Form, Input, message, Row, Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Container from 'react-bootstrap/Container';
+import Container from "react-bootstrap/Container";
 
 export default function RegisterKaderPosyandu() {
   const [form] = Form.useForm();
@@ -15,14 +15,14 @@ export default function RegisterKaderPosyandu() {
       .then((response) => {
         setDataSource(response.data.data);
       })
-      .catch((err) => { });
+      .catch((err) => {});
 
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/api/desa`)
       .then((response) => {
         setDataDesa(response.data.data);
       })
-      .catch((err) => { });
+      .catch((err) => {});
     // eslint-disable-next-line
   }, []);
 
@@ -56,11 +56,17 @@ export default function RegisterKaderPosyandu() {
 
   return (
     <>
-      <Container fluid style={{ backgroundColor: "white", padding:"20px", borderRadius:"20px" }}>
-        <h1 style={{fontSize:"20px", textAlign:"center", margin:"20px 0px 25px 0px"}}>Registrasi Kader Posyandu</h1>
+      <Container
+        fluid
+        style={{
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "20px",
+        }}
+      >
         {contextHolder}
-        <Row justify="center">
-          <Col span={12}>
+        <Row justify="space-between">
+          <Col sm={24}>
             <Form
               form={form}
               name="basic"
@@ -69,6 +75,11 @@ export default function RegisterKaderPosyandu() {
               autoComplete="off"
               layout="horizontal"
             >
+              <div className="flex justify-start items-center mb-4">
+                <h2 className="text-sm font-semibold">
+                  Registrasi Kader Posyandu
+                </h2>
+              </div>
               <Form.Item
                 label="Nama"
                 name="nama"
@@ -131,7 +142,9 @@ export default function RegisterKaderPosyandu() {
                       if (!value || getFieldValue("password") === value) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error("Password tidak sesuai!"));
+                      return Promise.reject(
+                        new Error("Password tidak sesuai!")
+                      );
                     },
                   }),
                 ]}
@@ -145,6 +158,7 @@ export default function RegisterKaderPosyandu() {
                 rules={[
                   {
                     required: true,
+                    message: "Desa masih kosong!",
                   },
                 ]}
               >
@@ -169,6 +183,7 @@ export default function RegisterKaderPosyandu() {
                 rules={[
                   {
                     required: true,
+                    message: "Posyandu masih kosong!",
                   },
                 ]}
               >
@@ -186,16 +201,18 @@ export default function RegisterKaderPosyandu() {
                     ))}
                 </Select>
               </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Kirim
-                </Button>
-              </Form.Item>
+
+              <Col span={24} align="center">
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Kirim
+                  </Button>
+                </Form.Item>
+              </Col>
             </Form>
           </Col>
         </Row>
       </Container>
-
     </>
   );
 }

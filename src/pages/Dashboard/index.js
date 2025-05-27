@@ -1,4 +1,4 @@
-import { Col, Row, Space, Table } from "antd";
+import { Avatar, Space, Table } from "antd";
 import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -6,30 +6,18 @@ import { Link } from "react-router-dom";
 import FormInputDataAnak from "../../components/form/FormInputDataAnak";
 import FormUpdateDataAnak from "../../components/form/FormUpdateDataAnak";
 import Navbar from "../../components/layout/Navbar";
-import Navigation from "../../components/layout/Navigation";
-import './dashboard-style.css';
 import bg_dashboard from "../../assets/img/bg-dashboard.svg";
-import Carousel from 'react-bootstrap/Carousel';
+import Carousel from "react-bootstrap/Carousel";
 import bayi from "../../assets/img/bayi_1.png";
-import footerImage from "../../assets/img/powered_by_telkom.svg";
 
+import "./dashboard-style.css";
 
-
-const BackgroundComponent = () => {
-  const backgroundStyles = {
-    position: "absolute",
-    top: 80,
-    left: -5,
-    width: "100vw",
-    height: '40%',
-    zIndex: -10000,
-    background: `url(${bg_dashboard}) no-repeat center`,
-    backgroundSize: '100vw auto',
-    borderRadius: "0 0 50px 50px",
-    boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.19)"
-  };
-  return <div style={backgroundStyles} />;
-};
+const BackgroundComponent = () => (
+  <div
+    className="absolute top-[80px] left-[-5px] w-[calc(100%+10px)] h-[40vh] min-h-[150px] sm:min-h-[200px] z-[-10000] bg-no-repeat bg-center bg-cover sm:bg-cover rounded-b-[50px] shadow-[0_10px_20px_rgba(0,0,0,0.19)]"
+    style={{ backgroundImage: `url(${bg_dashboard})` }}
+  />
+);
 
 export default function Dashboard() {
   let login_data;
@@ -37,7 +25,6 @@ export default function Dashboard() {
     login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
   }
 
-  // eslint-disable-next-line
   const [user, setUser] = useState(login_data);
   const [isOpenModalInputDataAnak, setIsOpenModalInputDataAnak] =
     useState(false);
@@ -49,46 +36,30 @@ export default function Dashboard() {
   const [dataAnak, setDataAnak] = useState(null);
 
   useEffect(() => {
-
     function fetchDataAnak() {
-      if (user.user.role !== "ORANG_TUA") {
-        axios
-          .get(`${process.env.REACT_APP_BASE_URL}/api/posyandu/data-anak`, {
-            headers: { Authorization: `Bearer ${user.token.value}` },
-          })
-          .then((response) => {
-            const sortedData = response.data.data.sort((a, b) =>
-              b.created_at.localeCompare(a.created_at)
-            );
-            setData(sortedData);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            setIsLoading(false);
-            console.log(err);
-          });
-      } else {
-        axios
-          .get(`${process.env.REACT_APP_BASE_URL}/api/orang-tua/data-anak`, {
-            headers: { Authorization: `Bearer ${user.token.value}` },
-          })
-          .then((response) => {
-            const sortedData = response.data.data.sort((a, b) =>
-              b.created_at.localeCompare(a.created_at)
-            );
-            setData(sortedData);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            setIsLoading(false);
-            console.log(err);
-          });
-      }
+      const url =
+        user.user.role !== "ORANG_TUA"
+          ? `${process.env.REACT_APP_BASE_URL}/api/posyandu/data-anak`
+          : `${process.env.REACT_APP_BASE_URL}/api/orang-tua/data-anak`;
+      axios
+        .get(url, {
+          headers: { Authorization: `Bearer ${user.token.value}` },
+        })
+        .then((response) => {
+          const sortedData = response.data.data.sort((a, b) =>
+            b.created_at.localeCompare(a.created_at)
+          );
+          setData(sortedData);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log(err);
+        });
     }
 
     fetchDataAnak();
-    // eslint-disable-next-line
-  }, [refreshKey]);
+  }, [refreshKey, user]);
 
   function deleteAnak(id) {
     axios
@@ -98,7 +69,7 @@ export default function Dashboard() {
           headers: { Authorization: `Bearer ${user.token.value}` },
         }
       )
-      .then((response) => {
+      .then(() => {
         setRefreshKey((oldKey) => oldKey + 1);
       })
       .catch((err) => {
@@ -113,14 +84,14 @@ export default function Dashboard() {
       key: "nama",
     },
     {
-      title: "Tanggal Lalhir",
+      title: "Tanggal Lahir",
       dataIndex: "tanggal_lahir",
       key: "tanggal_lahir",
     },
     {
       title: "Umur",
       dataIndex: "tanggal_lahir",
-      key: "tanggal_lahir",
+      key: "umur",
       render: (umur) => `${moment().diff(moment(umur), "month")} Bulan`,
     },
     {
@@ -129,11 +100,6 @@ export default function Dashboard() {
       dataIndex: "gender",
       render: (gender) => (gender === "LAKI_LAKI" ? "Laki-laki" : "Perempuan"),
     },
-    // {
-    //   title: "Orang Tua",
-    //   key: "orang_tua",
-    //   dataIndex: "orang_tua",
-    // },
     {
       title: "Alamat",
       key: "alamat",
@@ -145,23 +111,10 @@ export default function Dashboard() {
       render: (_, record) => (
         <Space size="middle">
           <Link to={`/dashboard/detail/${record.id}`}>
-            <button
-              type="button"
-              className="button_dashboard"
-            >
+            <button type="button" className="button_dashboard">
               Detail
             </button>
           </Link>
-          {/* <button
-            type="button"
-            className="button_dashboard"
-            onClick={() => {
-              setDataAnak(record);
-              setIsOpenModalUpdateDataAnak(true);
-            }}
-          >
-            Update
-          </button> */}
           {user && user.user.role !== "ORANG_TUA" && (
             <button
               className="button_dashboard"
@@ -180,81 +133,94 @@ export default function Dashboard() {
     <>
       <BackgroundComponent />
       <Navbar isLogin />
-      <Row className="justify-content-center align-items-center d-flex p-4" style={{ height: "400px", padding: "30px" }}>
-        <Col sm="6" style={{ width: "400px" }}>
-          <h6 className="dashboard">Hallo</h6>
-          <h6 className="dashboard">{user && user.user.name}</h6>
-          <h5 style={{ color: "#B14444" }}>Selamat Datang Kembali</h5>
-          <button class="cssbuttons-io-button" onClick={() => setIsOpenModalInputDataAnak(true)}
-            type="button">Tambah Anak
-            <div class="icon">
-              <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z" fill="#FF9999" />
-              </svg>
+      <div className="flex justify-center  p-4 sm:p-8 lg:h-[400px] h-[600px]">
+        <div className="flex flex-col lg:flex-row gap-4 w-full max-w-[700px]">
+          <div className="flex-1 ">
+            <h6 className="dashboard ">Hallo</h6>
+            <h6 className="dashboard ">{user && user.user.name}</h6>
+            <h5 className="text-[#B14444] text-lg sm:text-xl mb-4">
+              Selamat Datang Kembali
+            </h5>
+            <button
+              className="cssbuttons-io-button"
+              onClick={() => setIsOpenModalInputDataAnak(true)}
+              type="button"
+            >
+              Tambah Anak
+              <div className="icon">
+                <svg
+                  width="49"
+                  height="48"
+                  viewBox="0 0 49 48"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z"
+                    fill="#FF9999"
+                  />
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div className="flex flex-1   items-center justify-center w-full">
+            <div className="max-w-[200px]">
+              {data.length > 0 && (
+                <Carousel>
+                  {data.map((item, index) => (
+                    <Carousel.Item
+                      interval={1000}
+                      className="flex justify-center p-2.5"
+                      key={index}
+                    >
+                      <Link to={`/dashboard/detail/${item.id}`}>
+                        <img className="w-full h-auto" src={bayi} alt="Slide" />
+                        <h6 className="absolute top-[260px] left-[20px] text-white text-sm sm:text-base">
+                          {item.nama}
+                        </h6>
+                        <h6 className="absolute top-[280px] left-[20px] text-white text-sm sm:text-base">
+                          {`${moment().diff(
+                            moment(item.tanggal_lahir),
+                            "month"
+                          )} Bulan`}
+                        </h6>
+                      </Link>
+                    </Carousel.Item>
+                  ))}
+                </Carousel>
+              )}
             </div>
-          </button>
-        </Col>
-        <Col sm="6" style={{ width: "200px" }}>
-          {data.length > 0 && (
-            <Carousel>
-              {data.map((item, index) => (
-                <Carousel.Item interval={1000} style={{ justifyContent: "center", padding: "10px" }} key={index}>
-                  <Link to={`/dashboard/detail/${item.id}`}>
-                    <img className="d-block w-100" src={bayi} alt="Slide" />
-                    <h6 style={{ position: "absolute", top: 260, left: 20, color: "white" }}>
-                      {item.nama}
-                    </h6>
-                    <h6 style={{ position: "absolute", top: 280, left: 20, color: "white" }}>
-                      {`${moment().diff(moment(item.tanggal_lahir), "month")} Bulan`}
-                    </h6>
-                  </Link>
-                </Carousel.Item>
-              ))}
-            </Carousel>
-          )}
-        </Col>
-      </Row>
-      <Row className="justify-content-center d-flex">
-        {/* <Col span={24}>
-          <Navigation
-            breadcrumb={[
-              {
-                title: "Dashboard",
-                link: "",
-              },
-            ]}
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center w-full px-4 sm:px-6">
+        <div className="w-full max-w-[1200px] overflow-x-auto">
+          <Table
+            columns={columns}
+            dataSource={data}
+            loading={isLoading}
+            pagination={{ pageSize: 7 }}
+            className="ant-table"
           />
-        </Col> */}
-
-        <Row className="align-items-center">
-          <Col span={24}>
-            <Table
-              columns={columns}
-              dataSource={data}
-              loading={isLoading}
-              pagination={{ pageSize: 7 }}
-            />
-
-
-
-          </Col>
-        </Row>
-      </Row>
-
-      <Col sm="12" className="d-flex ">
+        </div>
+      </div>
+      <div className="flex justify-center w-full">
         <FormInputDataAnak
           isOpen={isOpenModalInputDataAnak}
           onCancel={() => setIsOpenModalInputDataAnak(false)}
           fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
         />
-      </Col>
-
-      <FormUpdateDataAnak
-        isOpen={isOpenModalUpdateDataAnak}
-        onCancel={() => setIsOpenModalUpdateDataAnak(false)}
-        fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-        data={dataAnak}
-      />
+      </div>
+      <div className="flex justify-center w-full">
+        <FormUpdateDataAnak
+          isOpen={isOpenModalUpdateDataAnak}
+          onCancel={() => setIsOpenModalUpdateDataAnak(false)}
+          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+          data={dataAnak}
+        />
+      </div>
     </>
   );
 }
