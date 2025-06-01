@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, message, Row, Select } from "antd";
+import { Button, Form, Input, message, Select } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,11 +14,57 @@ const BackgroundComponent = () => (
 );
 
 export default function SignUp() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [role, setRole] = useState(3);
   const [dataDesa, setDataDesa] = useState(null);
   const [dataPosyandu, setDataPosyandu] = useState(null);
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    let login_data = null;
+    let isAuthenticated = false;
+    let userRole = null;
+
+    try {
+      if (typeof window !== "undefined") {
+        login_data = JSON.parse(localStorage.getItem("login_data") || "{}");
+        isAuthenticated =
+          login_data &&
+          login_data.token &&
+          login_data.user &&
+          login_data.user.role;
+        userRole = isAuthenticated ? login_data.user.role : null;
+      }
+    } catch (error) {
+      console.error("Error parsing login_data:", error);
+      localStorage.removeItem("login_data"); // Clear invalid data
+      isAuthenticated = false;
+    }
+
+    if (isAuthenticated) {
+      // Redirect to role-specific dashboard
+      const redirectPath =
+        userRole === "ORANG_TUA"
+          ? "/dashboard"
+          : userRole === "KADER_POSYANDU"
+          ? "/kader-posyandu/dashboard"
+          : userRole === "TENAGA_KESEHATAN"
+          ? "/tenaga-kesehatan/dashboard"
+          : userRole === "DESA"
+          ? "/desa/dashboard"
+          : userRole === "ADMIN"
+          ? "/admin/dashboard/desa"
+          : "/"; // Fallback to home if role is unknown
+
+      messageApi.open({
+        type: "info",
+        content: "Anda sudah login. Mengarahkan ke dashboard...",
+      });
+
+      navigate(redirectPath, { replace: true });
+    }
+  }, [navigate, messageApi]);
 
   useEffect(() => {
     axios
@@ -76,6 +122,7 @@ export default function SignUp() {
           password: values.password,
           id_desa: values.desa,
           id_posyandu: values.posyandu,
+          alamat: values.alamat, // Include alamat for ORANG_TUA
         })
         .then((response) => {
           messageApi.open({
@@ -132,213 +179,129 @@ export default function SignUp() {
               layout="vertical"
               className="w-full"
             >
-              {true && (
-                <>
-                  <Form.Item
-                    label="Nama"
-                    name="nama"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Nama masih kosong!",
-                        type: "string",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Nama Lengkap" />
-                  </Form.Item>
+              <Form.Item
+                label="Role"
+                name="role"
+                initialValue={role}
+                rules={[{ required: true, message: "Pilih role!" }]}
+              >
+                <Select
+                  placeholder="Pilih Role"
+                  onChange={(value) => setRole(value)}
+                >
+                  <Select.Option value={3}>Orang Tua</Select.Option>
+                  <Select.Option value={4}>Kader Posyandu</Select.Option>
+                </Select>
+              </Form.Item>
 
-                  <Form.Item
-                    label="Alamat"
-                    name="alamat"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Alamat masih kosong!",
-                        type: "string",
-                      },
-                    ]}
-                  >
-                    <Input.TextArea rows={4} />
-                  </Form.Item>
+              <Form.Item
+                label="Nama"
+                name="nama"
+                rules={[
+                  {
+                    required: true,
+                    message: "Nama masih kosong!",
+                    type: "string",
+                  },
+                ]}
+              >
+                <Input placeholder="Nama Lengkap" />
+              </Form.Item>
 
-                  <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                      { required: true, message: "Email masih kosong!" },
-                      { type: "email", message: "Email belum sesuai!" },
-                    ]}
-                  >
-                    <Input placeholder="user@email.com" />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
-                      { required: true, message: "Password masih kosong!" },
-                      {
-                        pattern: "^.{8,}$",
-                        message: "Password minimal 8 karakter",
-                      },
-                    ]}
-                  >
-                    <Input.Password placeholder="password" />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="Confirm Password"
-                    name="confirm"
-                    dependencies={["password"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Silahkan Confirm Password Anda!",
-                      },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue("password") === value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Password tidak sesuai!")
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password placeholder="Confirm Password" />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="desa"
-                    label="Desa"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="Pilih Desa" allowClear>
-                      {dataDesa &&
-                        dataDesa.map((value) => (
-                          <Select.Option key={value.id} value={value.id}>
-                            {value.name}
-                          </Select.Option>
-                        ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="posyandu"
-                    label="Posyandu"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="Pilih Posyandu" allowClear>
-                      {dataPosyandu &&
-                        dataPosyandu.map((value) => (
-                          <Select.Option key={value.id} value={value.id}>
-                            {value.nama}
-                          </Select.Option>
-                        ))}
-                    </Select>
-                  </Form.Item>
-                </>
+              {role === 3 && (
+                <Form.Item
+                  label="Alamat"
+                  name="alamat"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Alamat masih kosong!",
+                      type: "string",
+                    },
+                  ]}
+                >
+                  <Input.TextArea rows={4} />
+                </Form.Item>
               )}
 
-              {role === 4 && (
-                <>
-                  <Form.Item
-                    label="Nama"
-                    name="nama"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Nama masih kosong!",
-                        type: "string",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Nama Lengkap" />
-                  </Form.Item>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Email masih kosong!" },
+                  { type: "email", message: "Email belum sesuai!" },
+                ]}
+              >
+                <Input placeholder="user@email.com" />
+              </Form.Item>
 
-                  <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                      { required: true, message: "Email masih kosong!" },
-                      { type: "email", message: "Email belum sesuai!" },
-                    ]}
-                  >
-                    <Input placeholder="user@email.com" />
-                  </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  { required: true, message: "Password masih kosong!" },
+                  {
+                    pattern: "^.{8,}$",
+                    message: "Password minimal 8 karakter",
+                  },
+                ]}
+              >
+                <Input.Password placeholder="password" />
+              </Form.Item>
 
-                  <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
-                      { required: true, message: "Password masih kosong!" },
-                      {
-                        pattern: "^.{8,}$",
-                        message: "Password minimal 8 karakter",
-                      },
-                    ]}
-                  >
-                    <Input.Password placeholder="password" />
-                  </Form.Item>
+              <Form.Item
+                label="Confirm Password"
+                name="confirm"
+                dependencies={["password"]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Silahkan Confirm Password Anda!",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Password tidak sesuai!")
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Confirm Password" />
+              </Form.Item>
 
-                  <Form.Item
-                    label="Confirm Password"
-                    name="confirm"
-                    dependencies={["password"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Silahkan Confirm Password Anda!",
-                      },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue("password") === value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Password tidak sesuai!")
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password placeholder="Confirm Password" />
-                  </Form.Item>
+              <Form.Item
+                name="desa"
+                label="Desa"
+                rules={[{ required: true, message: "Pilih Desa!" }]}
+              >
+                <Select placeholder="Pilih Desa" allowClear>
+                  {dataDesa &&
+                    dataDesa.map((value) => (
+                      <Select.Option key={value.id} value={value.id}>
+                        {value.name}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
 
-                  <Form.Item
-                    name="desa"
-                    label="Desa"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="Pilih Desa" allowClear>
-                      {dataDesa &&
-                        dataDesa.map((value) => (
-                          <Select.Option key={value.id} value={value.id}>
-                            {value.name}
-                          </Select.Option>
-                        ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="posyandu"
-                    label="Posyandu"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="Pilih Posyandu" allowClear>
-                      {dataPosyandu &&
-                        dataPosyandu.map((value) => (
-                          <Select.Option key={value.id} value={value.id}>
-                            {value.nama}
-                          </Select.Option>
-                        ))}
-                    </Select>
-                  </Form.Item>
-                </>
-              )}
+              <Form.Item
+                name="posyandu"
+                label="Posyandu"
+                rules={[{ required: true, message: "Pilih Posyandu!" }]}
+              >
+                <Select placeholder="Pilih Posyandu" allowClear>
+                  {dataPosyandu &&
+                    dataPosyandu.map((value) => (
+                      <Select.Option key={value.id} value={value.id}>
+                        {value.nama}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
 
               <Form.Item>
                 <button

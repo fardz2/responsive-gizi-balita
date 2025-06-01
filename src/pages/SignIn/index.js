@@ -1,7 +1,7 @@
-import { Col, Form, Input, message, Row, Spin } from "antd";
+import { Form, Input, message, Spin } from "antd";
 import axios from "axios";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { MailOutlined, KeyOutlined } from "@ant-design/icons";
 import logo from "./GiziBalita_logo.png";
 import background from "./login_bg.svg";
@@ -12,9 +12,9 @@ const BackgroundComponent = () => (
     className="fixed inset-0 z-[-10000] bg-center bg-no-repeat"
     style={{
       backgroundImage: `url(${background})`,
-      backgroundSize: "cover", // Ensures the image covers the entire area
+      backgroundSize: "cover",
       backgroundPosition: "center",
-      minHeight: "100vh", // Ensures full viewport height
+      minHeight: "100vh",
     }}
   />
 );
@@ -22,8 +22,66 @@ const BackgroundComponent = () => (
 export default function SignIn(props) {
   const { TenagaKesehatan, Desa, kaderPosyandu, admin } = props;
   const navigate = useNavigate();
+  const location = useLocation();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(false);
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    let login_data = null;
+    let isAuthenticated = false;
+    let userRole = null;
+
+    try {
+      if (typeof window !== "undefined") {
+        login_data = JSON.parse(localStorage.getItem("login_data") || "{}");
+        isAuthenticated =
+          login_data &&
+          login_data.token &&
+          login_data.user &&
+          login_data.user.role;
+        userRole = isAuthenticated ? login_data.user.role : null;
+      }
+    } catch (error) {
+      console.error("Error parsing login_data:", error);
+      localStorage.removeItem("login_data"); // Clear invalid data
+      isAuthenticated = false;
+    }
+
+    if (isAuthenticated) {
+      // Redirect to role-specific dashboard
+      const redirectPath =
+        userRole === "ORANG_TUA"
+          ? "/dashboard"
+          : userRole === "KADER_POSYANDU"
+          ? "/kader-posyandu/dashboard"
+          : userRole === "TENAGA_KESEHATAN"
+          ? "/tenaga-kesehatan/dashboard"
+          : userRole === "DESA"
+          ? "/desa/dashboard"
+          : userRole === "ADMIN"
+          ? "/admin/dashboard/desa"
+          : "/"; // Fallback to home if role is unknown
+
+      messageApi.open({
+        type: "info",
+        content: "Anda sudah login. Mengarahkan ke dashboard...",
+      });
+
+      navigate(redirectPath, { replace: true });
+    }
+  }, [navigate, messageApi]);
+
+  // Determine the role for redirect purposes
+  const getRoleRedirect = () => {
+    if (TenagaKesehatan) return "TENAGA_KESEHATAN";
+    if (Desa) return "DESA";
+    if (kaderPosyandu) return "KADER_POSYANDU";
+    if (admin) return "ADMIN";
+    return "ORANG_TUA"; // Default role
+  };
+
+  const role = getRoleRedirect();
 
   const onFinish = (values) => {
     setLoading(true);
@@ -34,6 +92,16 @@ export default function SignIn(props) {
       })
       .then((response) => {
         const role_user = response.data.data.user.role;
+        if (role_user !== role && role !== "ORANG_TUA") {
+          setLoading(false);
+          messageApi.open({
+            type: "error",
+            content: `Akses ditolak. Anda bukan ${role
+              .replace("_", " ")
+              .toLowerCase()}.`,
+          });
+          return;
+        }
         messageApi.open({
           type: "success",
           content: "Berhasil Login",
@@ -41,16 +109,23 @@ export default function SignIn(props) {
         localStorage.setItem("login_data", JSON.stringify(response.data.data));
         setTimeout(() => {
           setLoading(false);
-          if (role_user === "ORANG_TUA") {
-            navigate("/dashboard/");
-          } else if (role_user === "KADER_POSYANDU") {
-            navigate("/kader-posyandu/dashboard/");
-          } else if (role_user === "TENAGA_KESEHATAN") {
-            navigate("/tenaga-kesehatan/dashboard");
-          } else if (role_user === "DESA") {
-            navigate("/desa/dashboard");
-          } else if (role_user === "ADMIN") {
-            navigate("/admin/dashboard/desa");
+          // Check if there's a previous page to redirect to
+          const from = location.state?.from?.pathname || null;
+          if (from && from !== "/sign-in" && from !== "/sign-up") {
+            navigate(from, { replace: true }); // Redirect to the previous page
+          } else {
+            // Fallback to role-specific dashboard
+            if (role_user === "ORANG_TUA") {
+              navigate("/dashboard/");
+            } else if (role_user === "KADER_POSYANDU") {
+              navigate("/kader-posyandu/dashboard/");
+            } else if (role_user === "TENAGA_KESEHATAN") {
+              navigate("/tenaga-kesehatan/dashboard");
+            } else if (role_user === "DESA") {
+              navigate("/デザ/dashboard");
+            } else if (role_user === "ADMIN") {
+              navigate("/admin/dashboard/desa");
+            }
           }
         }, 1000);
       })

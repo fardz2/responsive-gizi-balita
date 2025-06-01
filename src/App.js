@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Dashboard from "./pages/Dashboard";
 import Desa from "./pages/Desa/desa";
 import Detail from "./pages/Detail";
@@ -12,36 +12,36 @@ import MyPost from "./pages/MyPost";
 import NotFound from "./pages/NotFound";
 import Artikel from "./pages/Artikel";
 import PosyanduDashboard from "./pages/Posyandu";
-import DetailPosyandu from './pages/Posyandu/DetailPosyandu'
+import DetailPosyandu from "./pages/Posyandu/DetailPosyandu";
 import DashboardLayout from "./components/layout/Dashboard/DashboardLayout";
 import RequireAuth from "./utilities/RequireAuth";
 import LandingPageAdmin from "./pages/Admin/index";
 import DesaPage from "./pages/Admin/Desa/DesaPage";
-import PosyanduInput from "./pages/AdminDashboard/InputPosyandu";
 import InputPosyandu from "./pages/AdminDashboard/InputPosyandu";
-import RegisterKaderPosyandu from "./pages/AdminDashboard/RegisterKaderPosyandu.js";
+import RegisterKaderPosyandu from "./pages/AdminDashboard/RegisterKaderPosyandu";
 import RegisterTenkes from "./pages/AdminDashboard/RegisterTenagaKesehatan";
 import InputAcara from "./pages/Desa/input_acara";
-import ArtikelAdmin from "./pages/AdminDashboard/ArtikelAdmin"
+import ArtikelAdmin from "./pages/AdminDashboard/ArtikelAdmin";
 import DetailArtikel from "./pages/Admin/DetailArtikel";
+
 const ROLES = {
-  'Desa': "DESA",
-  'Posyandu': "KADER_POSYANDU",
-  'Admin': "ADMIN",
-  'OT': "ORANG_TUA",
-  'TK': "TENAGA_KESEHATAN"
-}
+  Desa: "DESA",
+  Posyandu: "KADER_POSYANDU",
+  Admin: "ADMIN",
+  OT: "ORANG_TUA",
+  TK: "TENAGA_KESEHATAN",
+};
 
 const ROUTES = {
-  'DESAROUTE': "desa",
-  'POSYANDUROUTE': "posyandu",
-  'REGISTPOSYANDU': "kader-posyandu",
-  'REGISTTENKES': "tenaga-kesehatan",
-  'ARTIKEL': "artikel"
-}
+  DESAROUTE: "desa",
+  POSYANDUROUTE: "posyandu",
+  REGISTPOSYANDU: "kader-posyandu",
+  REGISTTENKES: "tenaga-kesehatan",
+  ARTIKEL: "artikel",
+};
+
 function App() {
   return (
-
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -94,20 +94,23 @@ function App() {
 
         {/* Role Orang_tua */}
         <Route element={<RequireAuth allowedRoles={[ROLES.OT]} />}>
-          <Route path="/dashboard" element={
-            <Dashboard />
-          } />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/forum" element={<Post />} />
           <Route path="/forum/detail/:id" element={<DetailForum />} />
           <Route path="/my-forum" element={<MyPost />} />
           <Route path="/dashboard/detail/:id" element={<Detail />} />
-
         </Route>
 
         {/* Role Kader Posyandu */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Posyandu]} />}>
-          <Route path="/kader-posyandu/dashboard/" element={<PosyanduDashboard />} />
-          <Route path="/kader-posyandu/dashboard/detail/:id" element={<DetailPosyandu />} />
+          <Route
+            path="/kader-posyandu/dashboard"
+            element={<PosyanduDashboard />}
+          />
+          <Route
+            path="/kader-posyandu/dashboard/detail/:id"
+            element={<DetailPosyandu />}
+          />
         </Route>
 
         {/* Role Desa */}
@@ -118,24 +121,30 @@ function App() {
 
         {/* Role Admin */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-          <Route path="/admin/dashboard" element={<DashboardLayout />} >
+          <Route path="/admin/dashboard" element={<DashboardLayout />}>
             <Route path={ROUTES.DESAROUTE} element={<DesaPage />} />
             <Route path={ROUTES.POSYANDUROUTE} element={<InputPosyandu />} />
-            <Route path={ROUTES.REGISTPOSYANDU} element={<RegisterKaderPosyandu />} />
+            <Route
+              path={ROUTES.REGISTPOSYANDU}
+              element={<RegisterKaderPosyandu />}
+            />
             <Route path={ROUTES.REGISTTENKES} element={<RegisterTenkes />} />
             <Route path={ROUTES.ARTIKEL} element={<ArtikelAdmin />} />
           </Route>
         </Route>
+
+        {/* Role Tenaga Kesehatan */}
         <Route element={<RequireAuth allowedRoles={[ROLES.TK]} />}>
           <Route path="/tenaga-kesehatan/dashboard" element={<Post />} />
         </Route>
+
+        {/* Public Routes */}
         <Route path="/tenaga-kesehatan/detail/:id" element={<DetailForum />} />
         <Route path="/artikel" element={<Artikel />} />
         <Route path="/artikel/:id" element={<DetailArtikel />} />
 
-        <Route path="/*" element={<NotFound />} />
-
-        <Route path="/*" element={<NotFound />} />
+        {/* Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
