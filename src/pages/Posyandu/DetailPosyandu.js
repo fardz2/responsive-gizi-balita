@@ -863,10 +863,10 @@ export default function DetailPosyandu() {
               lg={8} // Original span for desktop
               className="text-start"
             >
-              <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4">
+              <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4 text-2xl lg:text-5xl">
                 {dataAnak.nama}
               </h6>
-              <h6 className="dashboard text-base sm:text-lg lg:text-[25px] mb-4 sm:mb-6">
+              <h6 className="dashboard  sm:text-lg lg:text-[25px] mb-4 sm:mb-6 text-2xl lg:text-5xl">
                 {moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan
               </h6>
               <div className="flex justify-start">
