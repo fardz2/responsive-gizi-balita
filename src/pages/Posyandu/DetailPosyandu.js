@@ -19,22 +19,22 @@ import dataTinggiBadanByUmurPerempuan from "../../json/ZScorePanjangBadanPerempu
 import dataLingkarKepalaByUmurPria from "../../json/ZScoreLingkarKepalaLakiLaki.json";
 import dataLingkarKepalaByUmurPerempuan from "../../json/ZScoreLingkarKepalaPerempuan.json";
 import Navbar from "../../components/layout/Navbar";
-import { Col, Modal, Row, Space, message } from "antd";
+import { Modal, message } from "antd";
 import FormInputPerkembanganAnak from "../../components/form/FormInputPerkembanganAnak";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { monthDiff } from "../../utilities/calculateMonth";
 import FormUpdatePerkembanganAnak from "../../components/form/FormUpdatePerkembanganAnak";
 import Navigation from "../../components/layout/Navigation";
-import Image from 'react-bootstrap/Image';
+import Image from "react-bootstrap/Image";
+import { Row, Col } from "antd";
 import bayi from "../../assets/img/bayi_1.png";
 import "../Detail/detail-style.css";
-import { AlignCenterOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import bg_dashboard from "../../assets/img/bg-dashboard.svg";
 import footerImage from "../../assets/img/powered_by_telkom.svg";
 import Table from "../../components/layout/Table";
 import FormDetailPerkembanganAnak from "../../components/form/FormDetailDataPerkembanganAnak";
-// import { placementColumn } from "../../utilities/columnMonth";
 
 ChartJS.register(
   CategoryScale,
@@ -47,21 +47,12 @@ ChartJS.register(
   ...registerables
 );
 
-const BackgroundComponent = () => {
-  const backgroundStyles = {
-    position: "absolute",
-    top: 80,
-    left: -5,
-    width: "100vw",
-    height: '40%',
-    zIndex: -10000,
-    background: `url(${bg_dashboard}) no-repeat center`,
-    backgroundSize: '100vw auto',
-    borderRadius: "0 0 50px 50px",
-    boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.19)"
-  };
-  return <div style={backgroundStyles} />;
-};
+const BackgroundComponent = () => (
+  <div
+    className="absolute top-[80px] left-[-5px] w-[calc(100%+10px)] h-[40vh] min-h-[150px] sm:min-h-[200px] z-[-10000] bg-no-repeat bg-center bg-cover sm:bg-cover rounded-b-[50px] shadow-[0_10px_20px_rgba(0,0,0,0.19)]"
+    style={{ backgroundImage: `url(${bg_dashboard})` }}
+  />
+);
 
 export default function DetailPosyandu() {
   let { id } = useParams();
@@ -69,14 +60,13 @@ export default function DetailPosyandu() {
   if (typeof window !== "undefined") {
     login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
   }
-  // eslint-disable-next-line
   const [user, setUser] = useState(login_data);
   const [
     isOpenModalInputPerkembanganAnak,
     setIsOpenModalInputPerkembanganAnak,
   ] = useState(false);
   const [data, setData] = useState([]);
-  const [dataAnak, setDataAnak] = useState([]);
+  const [dataAnak, setDataAnak] = useState({}); // Initialize as object
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [
@@ -87,55 +77,22 @@ export default function DetailPosyandu() {
     isOpenModalUpdatePerkembanganAnak,
     setIsOpenModalUpdatePerkembanganAnak,
   ] = useState(false);
-  const [dataPerkembanganAnakDetail, setDataPerkembanganAnakDetail] = useState(null);
+  const [dataPerkembanganAnakDetail, setDataPerkembanganAnakDetail] =
+    useState(null);
   const [dataPerkembanganAnak, setDataPerkembanganAnak] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
-  // const columnYAxis = Array(61).fill(null);
-  // const columnYAxisBerat = placementColumn(
-  //   columnYAxis,
-  //   data,
-  //   dataAnak,
-  //   "berat"
-  // );
-  // const columnYAxisTinggi = placementColumn(
-  //   columnYAxis,
-  //   data,
-  //   dataAnak,
-  //   "tinggi"
-  // );
-  // const columnYAxisLingkarKepala = placementColumn(
-  //   columnYAxis,
-  //   data,
-  //   dataAnak,
-  //   "lingkar_kepala"
-  // );
 
-  // const labels = Array.from(Array(61).keys());
+  const labels = Array.from({ length: 61 }, (_, i) => i);
 
-  const labels = Array.from(Array(61).keys());
   function datasetChart(type) {
-    const dataset = [];
-    for (let i = 0; i < data.length; i++) {
-      if (
-        monthDiff(moment(dataAnak.tanggal_lahir), moment(data[i].date)) * -1 ===
-        monthDiff(moment(dataAnak.tanggal_lahir), moment(data[i].date))
-      ) {
-        dataset.push(
-          monthDiff(moment(dataAnak.tanggal_lahir), moment(data[i].date)) * -1
-        );
-      } else {
-        dataset.push(
-          monthDiff(moment(dataAnak.tanggal_lahir), moment(data[i].date))
-        );
-      }
-    }
+    const dataset = data.map((item) =>
+      monthDiff(moment(dataAnak.tanggal_lahir), moment(item.date))
+    );
 
     if (type === "berat") {
-      // buatlah 60 array dari bulan "dataset"
       const result = [];
       let j = 0;
       for (let i = 0; i < 61; i++) {
-        // kemudian dari "dataset" difilter yang ada value nya di ganti dengan value berat badan
         if (dataset.includes(i) && j < data.length) {
           result.push(Number(data[j].berat));
           j++;
@@ -145,11 +102,9 @@ export default function DetailPosyandu() {
       }
       return result;
     } else if (type === "tinggi") {
-      // buatlah 60 array dari bulan "dataset"
       const result = [];
       let j = 0;
       for (let i = 0; i < 61; i++) {
-        // kemudian dari "dataset" difilter yang ada value nya di ganti dengan value tinggi badan
         if (dataset.includes(i) && j < data.length) {
           result.push(Number(data[j].tinggi));
           j++;
@@ -159,11 +114,9 @@ export default function DetailPosyandu() {
       }
       return result;
     } else if (type === "lingkar_kepala") {
-      // buatlah 60 array dari bulan "dataset"
       const result = [];
       let j = 0;
       for (let i = 0; i < 61; i++) {
-        // kemudian dari "dataset" difilter yang ada value nya di ganti dengan value lingkar_kepala badan
         if (dataset.includes(i) && j < data.length) {
           result.push(Number(data[j].lingkar_kepala));
           j++;
@@ -175,12 +128,10 @@ export default function DetailPosyandu() {
     }
   }
 
-
   const dataChartPriaBB = {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.berat),
         data: datasetChart("berat"),
         pointBackgroundColor: "black",
         borderColor: "black",
@@ -237,7 +188,6 @@ export default function DetailPosyandu() {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.berat),
         data: datasetChart("berat"),
         pointBackgroundColor: "black",
         type: "scatter",
@@ -248,36 +198,43 @@ export default function DetailPosyandu() {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD3neg),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD2neg),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD1neg),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.median),
         borderColor: "rgb(154, 255, 136)",
         backgroundColor: "rgba(0, 255, 30, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD2pos),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataBeratBadanByUmurPerempuan.map((data) => data.SD3pos),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
     ],
   };
@@ -286,7 +243,6 @@ export default function DetailPosyandu() {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.tinggi),
         data: datasetChart("tinggi"),
         pointBackgroundColor: "black",
         type: "scatter",
@@ -297,36 +253,43 @@ export default function DetailPosyandu() {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD3neg),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD2neg),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD1neg),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.median),
         borderColor: "rgb(154, 255, 136)",
         backgroundColor: "rgba(0, 255, 30, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD2pos),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD3pos),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
     ],
   };
@@ -335,7 +298,6 @@ export default function DetailPosyandu() {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.tinggi),
         data: datasetChart("tinggi"),
         pointBackgroundColor: "black",
         type: "scatter",
@@ -346,36 +308,43 @@ export default function DetailPosyandu() {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD3neg),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD2neg),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD1neg),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.median),
         borderColor: "rgb(154, 255, 136)",
         backgroundColor: "rgba(0, 255, 30, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD2pos),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataTinggiBadanByUmurPerempuan.map((data) => data.SD3pos),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
     ],
   };
@@ -384,7 +353,6 @@ export default function DetailPosyandu() {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.lingkar_kepala),
         data: datasetChart("lingkar_kepala"),
         pointBackgroundColor: "black",
         type: "scatter",
@@ -395,36 +363,43 @@ export default function DetailPosyandu() {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD3neg),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD2neg),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD1neg),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.median),
         borderColor: "rgb(154, 255, 136)",
         backgroundColor: "rgba(0, 255, 30, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD2pos),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPria.map((data) => data.SD3pos),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
     ],
   };
@@ -433,7 +408,6 @@ export default function DetailPosyandu() {
     labels: labels,
     datasets: [
       {
-        // data: data.map((data) => data.lingkar_kepala),
         data: datasetChart("lingkar_kepala"),
         pointBackgroundColor: "black",
         type: "scatter",
@@ -444,36 +418,43 @@ export default function DetailPosyandu() {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD3neg),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD2neg),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD1neg),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.median),
         borderColor: "rgb(154, 255, 136)",
         backgroundColor: "rgba(0, 255, 30, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
         backgroundColor: "rgba(238, 255, 0, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD2pos),
         borderColor: "rgb(255, 137, 163)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
       {
         data: dataLingkarKepalaByUmurPerempuan.map((data) => data.SD3pos),
         borderColor: "rgb(255, 0, 55)",
         backgroundColor: "rgba(255, 0, 55, 0.5)",
+        type: "line",
       },
     ],
   };
@@ -491,7 +472,7 @@ export default function DetailPosyandu() {
         title: {
           display: true,
           text: "Umur (Bulan)",
-        }, // Maximum value for the x-axis
+        },
       },
     },
     elements: {
@@ -590,7 +571,7 @@ export default function DetailPosyandu() {
 
   useEffect(() => {
     function fetchDataPerkembanganAnak() {
-      if (user.user.role !== "ORANG_TUA") {
+      if (user?.user?.role !== "ORANG_TUA") {
         axios
           .get(
             `${process.env.REACT_APP_BASE_URL}/api/posyandu/statistik-anak/${id}`,
@@ -602,11 +583,15 @@ export default function DetailPosyandu() {
             const sortedData = response.data.data.sort((a, b) =>
               a.date.localeCompare(b.date)
             );
-
             setData(sortedData);
             setIsLoading(false);
           })
           .catch((err) => {
+            console.log(err);
+            messageApi.open({
+              type: "error",
+              content: "Gagal mengambil data perkembangan anak",
+            });
             setIsLoading(false);
           });
       } else {
@@ -621,34 +606,26 @@ export default function DetailPosyandu() {
             const sortedData = response.data.data.sort((a, b) =>
               a.date.localeCompare(b.date)
             );
-            // const sortedData = data.sort((a, b) => {
-            //   let da = new Date(a.date),
-            //     db = new Date(b.date);
-            //   return db - da;
-            // });
-            // const sortedTable = data.sort((a, b) => {
-            //   let da = new Date(a.date),
-            //     db = new Date(b.date);
-            //   return da - db;
-            // });
-
             setData(sortedData);
             setIsLoading(false);
           })
           .catch((err) => {
+            console.log(err);
+            messageApi.open({
+              type: "error",
+              content: "Gagal mengambil data perkembangan anak",
+            });
             setIsLoading(false);
           });
       }
     }
 
-    fetchDataPerkembanganAnak();
-
-    // eslint-disable-next-line
-  }, [refreshKey]);
+    if (user) fetchDataPerkembanganAnak();
+  }, [refreshKey, user]);
 
   useEffect(() => {
     function fetchDataAnakByID() {
-      if (user.user.role !== "ORANG_TUA") {
+      if (user?.user?.role !== "ORANG_TUA") {
         axios
           .get(
             `${process.env.REACT_APP_BASE_URL}/api/posyandu/data-anak/${id}`,
@@ -657,10 +634,14 @@ export default function DetailPosyandu() {
             }
           )
           .then((response) => {
-            setDataAnak(response.data.data);
+            setDataAnak(response.data.data); // Use response.data.data
           })
           .catch((err) => {
             console.log(err);
+            messageApi.open({
+              type: "error",
+              content: "Gagal mengambil data anak",
+            });
           });
       } else {
         axios
@@ -671,24 +652,29 @@ export default function DetailPosyandu() {
             }
           )
           .then((response) => {
-            setDataAnak(response.data.data);
+            setDataAnak(response.data.data); // Use response.data.data
           })
           .catch((err) => {
             console.log(err);
+            messageApi.open({
+              type: "error",
+              content: "Gagal mengambil data anak",
+            });
           });
       }
     }
 
-    fetchDataAnakByID();
-    // eslint-disable-next-line
-  }, []);
+    if (user) fetchDataAnakByID();
+  }, [user]);
 
   function deletePerkembanganAnak(id) {
     axios
       .delete(
         `${process.env.REACT_APP_BASE_URL}/api/posyandu/statistik-anak/${id}`,
         {
-          headers: { Authorization: `Bearer ${user.token.value}` },
+          headers: {
+            Authorization: `Bearer ${user.token.value}`,
+          },
         }
       )
       .then((response) => {
@@ -696,21 +682,21 @@ export default function DetailPosyandu() {
       })
       .catch((err) => {
         console.log(err);
+        messageApi.open({
+          type: "error",
+          content: "Gagal menghapus data",
+        });
       });
   }
 
   const columns = useMemo(() => {
     return [
       {
-        Header: 'Tanggal Pengukuran',
-        accessor: 'tanggalPengukuran',
+        Header: "Tanggal Pengukuran",
+        accessor: "tanggalPengukuran",
         Cell: ({ row }) => {
           const date = row.original.date;
-          return (
-            <span>
-              {moment(date).format("DD MMMM YYYY")}
-            </span>
-          );
+          return <span>{moment(date).format("DD MMMM YYYY")}</span>;
         },
       },
       {
@@ -720,94 +706,68 @@ export default function DetailPosyandu() {
           const tglPengukuran = row.original.date;
           return (
             <span>
-              {`${monthDiff(
-                moment(dataAnak.tanggal_lahir),
-                moment(tglPengukuran)
-              )} Bulan`}
+              {dataAnak.tanggal_lahir
+                ? `${monthDiff(
+                    moment(dataAnak.tanggal_lahir),
+                    moment(tglPengukuran)
+                  )} Bulan`
+                : "-"}
             </span>
           );
-        }
+        },
       },
       {
         Header: "Berat Badan",
         accessor: "berat",
         Cell: ({ value }) => {
-          return (
-            <span>
-              {value} kg
-            </span>
-            );
-          }
+          return <span>{value} kg</span>;
+        },
       },
       {
         Header: "Status - BB/U",
         accessor: "statusBB",
         Cell: ({ row }) => {
           const statusBB = row.original.statistik.berat;
-          return (
-            <span>
-              {statusBB}
-            </span>
-            );
-          }
+          return <span>{statusBB}</span>;
+        },
       },
       {
         Header: "Tinggi Badan",
         accessor: "tinggi",
         Cell: ({ value }) => {
-          return (
-              <span>
-                {value} cm
-              </span>
-          );
-        }
+          return <span>{value} cm</span>;
+        },
       },
       {
         Header: "Status - TB/U",
         accessor: "statusTB",
         Cell: ({ row }) => {
           const statusBB = row.original.statistik.tinggi;
-          return (
-            <span>
-              {statusBB}
-            </span>
-          );
-        }
+          return <span>{statusBB}</span>;
+        },
       },
       {
         Header: "Lingkar Kepala",
         accessor: "lingkar_kepala",
         Cell: ({ value }) => {
-          return (
-              <span>
-                {value} cm
-              </span>
-          );
-        }
+          return <span>{value} cm</span>;
+        },
       },
       {
         Header: "Status - LK/U",
         accessor: "statusLK",
         Cell: ({ row }) => {
           const statusBB = row.original.statistik.lingkar_kepala;
-          return (
-            <span>
-              {statusBB}
-            </span>
-          );
-        }
+          return <span>{statusBB}</span>;
+        },
       },
       {
         Header: "Status - Gizi",
         accessor: "statusGizi",
         Cell: ({ row }) => {
           const statusBB = row.original.statistik.gizi;
-          return (
-            <span>
-              {statusBB}
-            </span>
-          );
-        }
+          return <span>{statusBB}</span>;
+        },
       },
       {
         Header: "",
@@ -816,84 +776,67 @@ export default function DetailPosyandu() {
           const id = row.original.id;
           const dataAksi = row.original;
           return (
-            <>
-              <div style={{justifyContent:"space-between", display:"flex"}}>
-                {/* </Link> */}
-               
-                <button 
-                  type="button" 
-                  class="buttonUpdate"
-                  onClick={() => {
-                    setDataPerkembanganAnak(dataAksi);
-                    setIsOpenModalUpdatePerkembanganAnak(true);
-                  }}
-                >
-                  Update
-                </button>
-                <button 
-                  class="buttonDelete"
-                  onClick={() => {
-                    Modal.confirm({
-                      title: "Apakah anda yakin?",
-                      icon: <ExclamationCircleOutlined />,
-                      content: "Data yang dihapus tidak dapat dikembalikan",
-                      okText: "Ya",
-                      cancelText: "Tidak",
-                      onOk: () => {
-                        axios
-                          .delete(
-                            `${process.env.REACT_APP_BASE_URL}/api/posyandu/statistik-anak/${id}`,
-                            {
-                              headers: {
-                                Authorization: `Bearer ${user.token.value}`,
-                              },
-                            }
-                          )
-                          .then((response) => {
-                            messageApi.open({
-                              type: "success",
-                              content: "Data berhasil dihapus",
-                            });
-                            setTimeout(() => {
-                              setRefreshKey((oldKey) => oldKey + 1);
-                              window.location.reload();
-                              fetch();
-                            }, 1000);
-                          })
-                          
-                          .catch((err) => {
-                            console.log(err);
-                            messageApi.open({
-                              type: "error",
-                              content: "Data gagal dihapus",
-                          });
-                          });
-                      },
-                    })
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            {/* <div className="flex">
-              <CustomButton className="bg-orange-500">
-                Detail
-              </CustomButton>
-              <CustomButton className="bg-green-300">
+            <div style={{ justifyContent: "space-between", display: "flex" }}>
+              <button
+                type="button"
+                className="buttonUpdate"
+                onClick={() => {
+                  setDataPerkembanganAnak(dataAksi);
+                  setIsOpenModalUpdatePerkembanganAnak(true);
+                }}
+              >
                 Update
-              </CustomButton>
-              <CustomButton className="bg-red-300">
+              </button>
+              <button
+                className="buttonDelete"
+                onClick={() => {
+                  Modal.confirm({
+                    title: "Apakah anda yakin?",
+                    icon: <ExclamationCircleOutlined />,
+                    content: "Data yang dihapus tidak dapat dikembalikan",
+                    okText: "Ya",
+                    cancelText: "Tidak",
+                    onOk: () => {
+                      axios
+                        .delete(
+                          `${process.env.REACT_APP_BASE_URL}/api/posyandu/statistik-anak/${id}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${user.token.value}`,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          messageApi.open({
+                            type: "success",
+                            content: "Data berhasil dihapus",
+                          });
+                          setTimeout(() => {
+                            setRefreshKey((oldKey) => oldKey + 1);
+                            window.location.reload();
+                          }, 1000);
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                          messageApi.open({
+                            type: "error",
+                            content: "Data gagal dihapus",
+                          });
+                        });
+                    },
+                  });
+                }}
+              >
                 Delete
-              </CustomButton>
-            </div> */}
-            
-            </>
+              </button>
+            </div>
           );
-        }
-      }
+        },
+      },
     ];
-  }, []);
-  const [activeContent, setActiveContent] = useState('Content 1');
+  }, [dataAnak, user, messageApi]);
+
+  const [activeContent, setActiveContent] = useState("Content 1");
 
   const handleButtonClick = (content) => {
     setActiveContent(content);
@@ -904,62 +847,97 @@ export default function DetailPosyandu() {
       {contextHolder}
       <Navbar isLogin />
       <BackgroundComponent />
-      <Row style={{ display: "flex", justifyContent: "center", padding: "50px" }}>
+      <Row
+        style={{ display: "flex", justifyContent: "center", padding: "50px" }}
+      >
         <Col span={24}>
-          {/* <button
-            onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
-            type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-6 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          <Row
+            className="justify-center items-center py-6 sm:py-8 lg:py-10 min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
+            justify="center"
+            align="middle"
           >
-            Data Perkembangan Anak +
-          </button> */}
-          <Row style={{ alignItems: "center", height: "350px" }} justify={"center"} >
-            <Col span={12}>
-              <h6 className="dashboard">{dataAnak.nama}</h6>
-              <h6 className="dashboard" style={{ fontSize: "25px" }}>{`${moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan`}</h6>
-              
-              <div style={{justifyContent:"start", display:"flex"}}>
-                <button class="cssbuttons-io-button" onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
-                  type="button" style={{ marginBottom: "20px", marginRight: "20px" }}>Tambah
-                  <div class="icon">
-                    <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd" clip-rule="evenodd" d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z" fill="#FF9999" />
+            <Col
+              xs={24} // Full width on mobile
+              sm={16} // Wider on small screens
+              md={12} // Adjusted for tablet
+              lg={8} // Original span for desktop
+              className="text-start"
+            >
+              <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4">
+                {dataAnak.nama || "Memuat..."}
+              </h6>
+              <h6 className="dashboard text-base sm:text-lg lg:text-[25px] mb-4 sm:mb-6">
+                {dataAnak.tanggal_lahir
+                  ? `${moment().diff(
+                      moment(dataAnak.tanggal_lahir),
+                      "month"
+                    )} Bulan`
+                  : "-"}
+              </h6>
+              <div className="flex justify-start">
+                <button
+                  className="cssbuttons-io-button"
+                  onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
+                >
+                  Tambah
+                  <div className="icon">
+                    <svg
+                      width="49"
+                      height="48"
+                      viewBox="0 0 49 48"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z"
+                        fill="#FF9999"
+                      />
                     </svg>
                   </div>
                 </button>
               </div>
-             
-              
             </Col>
-            <Col >
-              <Image style={{ width: "150px" }} src={bayi} rounded />
-            </Col>
+            <div className="flex justify-center items-center mt-10 md:mt-0">
+              <Image
+                src={bayi}
+                rounded
+                className="w-24 sm:w-28 md:w-32 lg:w-[150px] h-auto bg-center"
+              />
+            </div>
           </Row>
-
-
-
-
         </Col>
-
         <Col span={24}>
-          {/* <Table columns={columns} dataSource={data} loading={isLoading} /> */}
-          <Table
-            columns={columns} 
-            data={data}
-          />
+          <Table columns={columns} data={data} />
+        </Col>
+        <Col className="flex justify-center items-center flex-col md:flex-row mt-8 gap-3">
+          <button
+            className="button_detail"
+            onClick={() => handleButtonClick("Content 1")}
+          >
+            Berat Badan
+          </button>
+          <button
+            className="button_detail"
+            onClick={() => handleButtonClick("Content 2")}
+          >
+            Tinggi badan
+          </button>
+          <button
+            className="button_detail"
+            style={{ width: "190px" }}
+            onClick={() => handleButtonClick("Content 3")}
+          >
+            Lingkar kepala
+          </button>
         </Col>
 
-        <Col>
-          <button className="button_detail" onClick={() => handleButtonClick('Content 1')}>Berat Badan</button>
-          <button className="button_detail" onClick={() => handleButtonClick('Content 2')}>Tinggi badan</button>
-          <button className="button_detail" style={{ width: "190px" }} onClick={() => handleButtonClick('Content 3')}>Lingkar kepala</button>
-        </Col>
-
-        {activeContent === 'Content 1' && (
+        {activeContent === "Content 1" && (
           <Col className="mt-8 border-2 p-4 border-black" span={24}>
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaBB
                   : dataChartPerempuanBB
               }
@@ -968,11 +946,11 @@ export default function DetailPosyandu() {
           </Col>
         )}
 
-        {activeContent === 'Content 2' && (
+        {activeContent === "Content 2" && (
           <Col className="my-8 border-2 p-4 border-black" span={24}>
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaTB
                   : dataChartPerempuanTB
               }
@@ -981,11 +959,11 @@ export default function DetailPosyandu() {
           </Col>
         )}
 
-        {activeContent === 'Content 3' && (
+        {activeContent === "Content 3" && (
           <Col className="my-8 border-2 p-4 border-black" span={24}>
             <Line
               data={
-                dataAnak.gender === 'LAKI_LAKI'
+                dataAnak.gender === "LAKI_LAKI"
                   ? dataChartPriaLK
                   : dataChartPerempuanLK
               }
@@ -993,23 +971,23 @@ export default function DetailPosyandu() {
             />
           </Col>
         )}
+
+        <FormInputPerkembanganAnak
+          isOpen={isOpenModalInputPerkembanganAnak}
+          onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
+          data={dataAnak ? dataAnak : null}
+          idAnak={id}
+          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+        />
+
+        <FormUpdatePerkembanganAnak
+          isOpen={isOpenModalUpdatePerkembanganAnak}
+          onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
+          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+          data={dataPerkembanganAnak}
+          profil={dataAnak}
+        />
       </Row>
-
-      <FormInputPerkembanganAnak
-        isOpen={isOpenModalInputPerkembanganAnak}
-        onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
-        data={dataAnak ? dataAnak : null}
-        idAnak={id}
-        fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-      />
-
-      <FormUpdatePerkembanganAnak
-        isOpen={isOpenModalUpdatePerkembanganAnak}
-        onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
-        fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-        data={dataPerkembanganAnak}
-        profil={dataAnak}
-      />
     </>
   );
 }
