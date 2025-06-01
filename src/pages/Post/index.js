@@ -43,27 +43,6 @@ export default function Post() {
       <div className="flex flex-col justify-center px-4 sm:px-6 lg:px-8">
         <div className="w-full flex justify-center mt-6 sm:mt-8 lg:mt-10">
           <Spin size="large" spinning={isLoading} />
-          <Link to="/my-forum">
-            <button className="cssbuttons-io-button" type="button">
-              Pertanyaan
-              <div className="icon">
-                <svg
-                  width="49"
-                  height="48"
-                  viewBox="0 0 49 48"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z"
-                    fill="#FF9999"
-                  />
-                </svg>
-              </div>
-            </button>
-          </Link>
         </div>
         <div className="w-full flex justify-center mt-4 sm:mt-6">
           {!isLoading && (
