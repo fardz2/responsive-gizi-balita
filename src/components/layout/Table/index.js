@@ -148,7 +148,7 @@ function Table({
       {/* table */}
 
       {ButtonCus && (
-        <div className="flex flex-col sm:flex-row  justify-between">
+        <div className="flex flex-col sm:flex-row  justify-center items-center">
           <button
             className="button2"
             onClick={() => setIsOpenModalInputDataAnak(true)}
