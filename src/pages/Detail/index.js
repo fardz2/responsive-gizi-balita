@@ -1122,10 +1122,10 @@ export default function Detail() {
       <Navbar isLogin />
       <BackgroundComponent />
       <div className="flex flex-col items-center p-4 sm:p-6 lg:p-8 w-full justify-center">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px] items-center justify-center lg:h-[350px] h-auto mt-16">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px] items-center justify-center lg:h-[350px] h-auto mt-16 ">
           <div className="flex-1 text-left">
-            <h6 className="dashboard ">{dataAnak.nama}</h6>
-            <h6 className="dashboard text-xl sm:text-2xl">{`${moment().diff(
+            <h6 className="dashboard text-2xl lg:text-5xl">{dataAnak.nama}</h6>
+            <h6 className="dashboard text-2xl lg:text-5xl">{`${moment().diff(
               moment(dataAnak.tanggal_lahir),
               "month"
             )} Bulan`}</h6>
@@ -1151,7 +1151,7 @@ export default function Detail() {
         </div>
 
         {/* Buttons Section */}
-        <div className="flex flex-wrap gap-2 sm:gap-4 justify-center w-full max-w-[1200px] mt-4 sm:mt-6">
+        <div className="flex flex-wrap gap-3 sm:gap-4 justify-center w-full max-w-[1200px] mt-4 sm:mt-6">
           <button
             className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg"
             onClick={() => handleButtonClick("Content 1")}
@@ -1165,8 +1165,7 @@ export default function Detail() {
             Tinggi Badan
           </button>
           <button
-            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg w-full sm:w-auto"
-            style={{ minWidth: "150px" }}
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg "
             onClick={() => handleButtonClick("Content 3")}
           >
             Lingkar Kepala

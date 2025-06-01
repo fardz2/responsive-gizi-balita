@@ -228,7 +228,9 @@ const PosyanduDashboard = () => {
           style={{ marginTop: "94px" }}
         >
           <Col>
-            <h6 className="dashboard">Hallo {user && user.user.name}</h6>
+            <h6 className="dashboard text-2xl lg:text-5xl">
+              Hallo {user && user.user.name}
+            </h6>
           </Col>
         </Row>
         <Row className="justify-content-center" style={{ marginTop: "30px" }}>

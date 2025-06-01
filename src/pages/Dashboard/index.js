@@ -136,8 +136,10 @@ export default function Dashboard() {
       <div className="flex justify-center  p-4 sm:p-8 lg:h-[400px] h-[600px]">
         <div className="flex flex-col lg:flex-row gap-4 w-full max-w-[700px]">
           <div className="flex-1 ">
-            <h6 className="dashboard ">Hallo</h6>
-            <h6 className="dashboard ">{user && user.user.name}</h6>
+            <h6 className="dashboard text-2xl lg:text-5xl">Hallo</h6>
+            <h6 className="dashboard text-2xl lg:text-5xl ">
+              {user && user.user.name}
+            </h6>
             <h5 className="text-[#B14444] text-lg sm:text-xl mb-4">
               Selamat Datang Kembali
             </h5>
