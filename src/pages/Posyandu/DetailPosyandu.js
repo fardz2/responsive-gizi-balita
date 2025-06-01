@@ -864,15 +864,10 @@ export default function DetailPosyandu() {
               className="text-start"
             >
               <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4">
-                {dataAnak.nama || "Memuat..."}
+                {dataAnak.nama}
               </h6>
               <h6 className="dashboard text-base sm:text-lg lg:text-[25px] mb-4 sm:mb-6">
-                {dataAnak.tanggal_lahir
-                  ? `${moment().diff(
-                      moment(dataAnak.tanggal_lahir),
-                      "month"
-                    )} Bulan`
-                  : "-"}
+                {moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan
               </h6>
               <div className="flex justify-start">
                 <button
