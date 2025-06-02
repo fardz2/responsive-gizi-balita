@@ -31,7 +31,7 @@ export default function LandingPage() {
     <>
       <BackgroundComponent />
       <NavbarComp />
-      <div className="lg:px-16 sm:px-3 flex flex-col items-center">
+      <div className="pl-3 pt-3 lg:px-16 flex flex-col items-center">
         <div className="flex justify-center w-full mt-[30px]">
           <div
             className="flex flex-col lg:flex-row items-center w-full max-w-[1600px]"
@@ -69,18 +69,15 @@ export default function LandingPage() {
             <div className="w-full lg:w-1/2"></div>
           </div>
         </div>
-        <div className="flex justify-center w-full mt-5">
-          <div
-            className="w-full max-w-[1180px] bg-white rounded-[40px] flex justify-center"
-            style={{ filter: "drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))" }}
-          >
-            <video
-              src={video}
-              loop
-              autoPlay
-              muted
-              className="w-full h-auto aspect-[16/9] object-cover"
-            />
+        <div className="md:w-1/2 w-[80%] mx-auto bg-white rounded-2xl shadow-lg overflow-hidden mt-10">
+          <div className="relative aspect-video">
+            <iframe
+              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              src="https://www.youtube.com/embed/oYwKLxEDNXU?autoplay=1&mute=1&loop=1&playlist=oYwKLxEDNXU&iv_load_policy=3&rel=0&vq=hd1080"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
         <div className="flex justify-center w-full mt-[50px]">
@@ -90,14 +87,15 @@ export default function LandingPage() {
             className="w-full max-w-[1180px] h-auto px-4 sm:px-6"
           />
         </div>
-        <div className="flex justify-center w-full mt-[100px] bg-[#FFB4B4] py-6">
-          <img
-            src={footerImage}
-            alt="Footer"
-            className="w-full max-w-[300px] h-auto"
-          />
-        </div>
+
         <BannerBackground />
+      </div>
+      <div className="flex justify-center w-full mt-[100px] bg-[#FFB4B4] py-6">
+        <img
+          src={footerImage}
+          alt="Footer"
+          className="w-full max-w-[300px] h-auto"
+        />
       </div>
     </>
   );

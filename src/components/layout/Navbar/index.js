@@ -27,7 +27,7 @@ function BasicExample() {
 
   return (
     <Navbar style={navbarStyle} expand="md">
-      <Container>
+      <Container fluid="md">
         <Navbar.Brand href="#home">
           <img
             src={Logo}
