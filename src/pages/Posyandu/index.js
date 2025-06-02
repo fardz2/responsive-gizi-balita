@@ -12,6 +12,7 @@ import "./posyandu.css";
 import { Link, useNavigate } from "react-router-dom";
 import FormUpdateDataAnak from "../../components/form/FormUpdateDataAnak";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Container } from "react-bootstrap";
 
 const BackgroundComponent = () => {
   return (
@@ -222,7 +223,7 @@ const PosyanduDashboard = () => {
       </div>
       <BackgroundComponent />
       <Navbar isLogin kader />
-      <div className="container-fluid">
+      <Container fluid="md">
         <Row
           className="justify-content-center align-items-center flex"
           style={{ marginTop: "94px" }}
@@ -273,7 +274,7 @@ const PosyanduDashboard = () => {
             data={dataAnak}
           />
         </Col>
-      </div>
+      </Container>
     </>
   );
 };

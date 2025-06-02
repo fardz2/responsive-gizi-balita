@@ -35,6 +35,7 @@ import bg_dashboard from "../../assets/img/bg-dashboard.svg";
 import footerImage from "../../assets/img/powered_by_telkom.svg";
 import Table from "../../components/layout/Table";
 import FormDetailPerkembanganAnak from "../../components/form/FormDetailDataPerkembanganAnak";
+import { Container } from "react-bootstrap";
 
 ChartJS.register(
   CategoryScale,
@@ -847,142 +848,142 @@ export default function DetailPosyandu() {
       {contextHolder}
       <Navbar isLogin />
       <BackgroundComponent />
-      <Row
-        style={{ display: "flex", justifyContent: "center", padding: "50px" }}
-      >
-        <Col span={24}>
-          <Row
-            className="justify-center items-center py-6 sm:py-8 lg:py-10 min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
-            justify="center"
-            align="middle"
-          >
-            <Col
-              xs={24} // Full width on mobile
-              sm={16} // Wider on small screens
-              md={12} // Adjusted for tablet
-              lg={8} // Original span for desktop
-              className="text-start"
+      <Container fluid="md">
+        <Row style={{ display: "flex", justifyContent: "center" }}>
+          <Col span={24}>
+            <Row
+              className="justify-center items-center py-6 sm:py-8 lg:py-10 min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
+              justify="center"
+              align="middle"
             >
-              <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4 text-2xl lg:text-5xl">
-                {dataAnak.nama}
-              </h6>
-              <h6 className="dashboard  sm:text-lg lg:text-[25px] mb-4 sm:mb-6 text-2xl lg:text-5xl">
-                {moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan
-              </h6>
-              <div className="flex justify-start">
-                <button
-                  className="cssbuttons-io-button"
-                  onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
-                >
-                  Tambah
-                  <div className="icon">
-                    <svg
-                      width="49"
-                      height="48"
-                      viewBox="0 0 49 48"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z"
-                        fill="#FF9999"
-                      />
-                    </svg>
-                  </div>
-                </button>
+              <Col
+                xs={24} // Full width on mobile
+                sm={16} // Wider on small screens
+                md={12} // Adjusted for tablet
+                lg={8} // Original span for desktop
+                className="text-start"
+              >
+                <h6 className="dashboard mb-2 sm:mb-3 lg:mb-4 text-2xl lg:text-5xl">
+                  {dataAnak.nama}
+                </h6>
+                <h6 className="dashboard  sm:text-lg lg:text-[25px] mb-4 sm:mb-6 text-2xl lg:text-5xl">
+                  {moment().diff(moment(dataAnak.tanggal_lahir), "month")} Bulan
+                </h6>
+                <div className="flex justify-start">
+                  <button
+                    className="cssbuttons-io-button"
+                    onClick={() => setIsOpenModalInputPerkembanganAnak(true)}
+                  >
+                    Tambah
+                    <div className="icon">
+                      <svg
+                        width="49"
+                        height="48"
+                        viewBox="0 0 49 48"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M31 7C31 3.41015 28.0899 0.5 24.5 0.5C20.9101 0.5 18 3.41015 18 7V17.75H7.25C3.66015 17.75 0.75 20.6601 0.75 24.25C0.75 27.8398 3.66015 30.75 7.25 30.75H18V41.5C18 45.0899 20.9101 48 24.5 48C28.0899 48 31 45.0899 31 41.5V30.75H41.75C45.3399 30.75 48.25 27.8399 48.25 24.25C48.25 20.6601 45.3399 17.75 41.75 17.75H31V7Z"
+                          fill="#FF9999"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </Col>
+              <div className="flex justify-center items-center mt-10 md:mt-0">
+                <Image
+                  src={bayi}
+                  rounded
+                  className="w-24 sm:w-28 md:w-32 lg:w-[150px] h-auto bg-center"
+                />
               </div>
-            </Col>
-            <div className="flex justify-center items-center mt-10 md:mt-0">
-              <Image
-                src={bayi}
-                rounded
-                className="w-24 sm:w-28 md:w-32 lg:w-[150px] h-auto bg-center"
+            </Row>
+          </Col>
+          <Col span={24}>
+            <Table columns={columns} data={data} />
+          </Col>
+          <Col className="flex justify-center items-center flex-col md:flex-row mt-8 gap-3">
+            <button
+              className="button_detail"
+              onClick={() => handleButtonClick("Content 1")}
+            >
+              Berat Badan
+            </button>
+            <button
+              className="button_detail"
+              onClick={() => handleButtonClick("Content 2")}
+            >
+              Tinggi badan
+            </button>
+            <button
+              className="button_detail"
+              style={{ width: "190px" }}
+              onClick={() => handleButtonClick("Content 3")}
+            >
+              Lingkar kepala
+            </button>
+          </Col>
+
+          {activeContent === "Content 1" && (
+            <Col className="mt-8 border-2 p-4 border-black" span={24}>
+              <Line
+                data={
+                  dataAnak.gender === "LAKI_LAKI"
+                    ? dataChartPriaBB
+                    : dataChartPerempuanBB
+                }
+                options={optionsBB}
               />
-            </div>
-          </Row>
-        </Col>
-        <Col span={24}>
-          <Table columns={columns} data={data} />
-        </Col>
-        <Col className="flex justify-center items-center flex-col md:flex-row mt-8 gap-3">
-          <button
-            className="button_detail"
-            onClick={() => handleButtonClick("Content 1")}
-          >
-            Berat Badan
-          </button>
-          <button
-            className="button_detail"
-            onClick={() => handleButtonClick("Content 2")}
-          >
-            Tinggi badan
-          </button>
-          <button
-            className="button_detail"
-            style={{ width: "190px" }}
-            onClick={() => handleButtonClick("Content 3")}
-          >
-            Lingkar kepala
-          </button>
-        </Col>
+            </Col>
+          )}
 
-        {activeContent === "Content 1" && (
-          <Col className="mt-8 border-2 p-4 border-black" span={24}>
-            <Line
-              data={
-                dataAnak.gender === "LAKI_LAKI"
-                  ? dataChartPriaBB
-                  : dataChartPerempuanBB
-              }
-              options={optionsBB}
-            />
-          </Col>
-        )}
+          {activeContent === "Content 2" && (
+            <Col className="my-8 border-2 p-4 border-black" span={24}>
+              <Line
+                data={
+                  dataAnak.gender === "LAKI_LAKI"
+                    ? dataChartPriaTB
+                    : dataChartPerempuanTB
+                }
+                options={optionsTB}
+              />
+            </Col>
+          )}
 
-        {activeContent === "Content 2" && (
-          <Col className="my-8 border-2 p-4 border-black" span={24}>
-            <Line
-              data={
-                dataAnak.gender === "LAKI_LAKI"
-                  ? dataChartPriaTB
-                  : dataChartPerempuanTB
-              }
-              options={optionsTB}
-            />
-          </Col>
-        )}
+          {activeContent === "Content 3" && (
+            <Col className="my-8 border-2 p-4 border-black" span={24}>
+              <Line
+                data={
+                  dataAnak.gender === "LAKI_LAKI"
+                    ? dataChartPriaLK
+                    : dataChartPerempuanLK
+                }
+                options={optionsLK}
+              />
+            </Col>
+          )}
 
-        {activeContent === "Content 3" && (
-          <Col className="my-8 border-2 p-4 border-black" span={24}>
-            <Line
-              data={
-                dataAnak.gender === "LAKI_LAKI"
-                  ? dataChartPriaLK
-                  : dataChartPerempuanLK
-              }
-              options={optionsLK}
-            />
-          </Col>
-        )}
+          <FormInputPerkembanganAnak
+            isOpen={isOpenModalInputPerkembanganAnak}
+            onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
+            data={dataAnak ? dataAnak : null}
+            idAnak={id}
+            fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+          />
 
-        <FormInputPerkembanganAnak
-          isOpen={isOpenModalInputPerkembanganAnak}
-          onCancel={() => setIsOpenModalInputPerkembanganAnak(false)}
-          data={dataAnak ? dataAnak : null}
-          idAnak={id}
-          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-        />
-
-        <FormUpdatePerkembanganAnak
-          isOpen={isOpenModalUpdatePerkembanganAnak}
-          onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
-          fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
-          data={dataPerkembanganAnak}
-          profil={dataAnak}
-        />
-      </Row>
+          <FormUpdatePerkembanganAnak
+            isOpen={isOpenModalUpdatePerkembanganAnak}
+            onCancel={() => setIsOpenModalUpdatePerkembanganAnak(false)}
+            fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
+            data={dataPerkembanganAnak}
+            profil={dataAnak}
+          />
+        </Row>
+      </Container>
     </>
   );
 }

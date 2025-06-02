@@ -1,19 +1,29 @@
-import { Avatar, Col, Row } from "antd";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Avatar, Col, Row } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import ic_logout from "../../../assets/icon/log-out.png";
-import "./index.css";
-import "/node_modules/bootstrap/dist/css/bootstrap.css";
-import "/node_modules/bootstrap/dist/css/bootstrap-grid.min.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Logo from "../../../assets/img/GiziBalita_logo.png";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function BasicExample() {
+export default function NavbarComp(props) {
+  const { isLogin, admin, posyandu, desa, kader, tenkes } = props;
+  const navigate = useNavigate();
+  let login_data;
+  if (typeof window !== "undefined") {
+    login_data = JSON.parse(localStorage.getItem("login_data") || "{}");
+  }
+  const [user, setUser] = useState(login_data);
+  const [activeLink, setActiveLink] = useState("");
+
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+    setActiveLink(currentPath);
+  }, []);
+
   const navbarStyle = {
     display: "flex",
     alignItems: "center",
@@ -22,17 +32,29 @@ function BasicExample() {
     color: "#ffffff",
     height: "80px",
     paddingTop: "20px",
-    zIndex: 1000, // Added z-index
+    zIndex: 1000,
   };
 
-  return (
+  const navLinkStyle = {
+    color: "white",
+    margin: "0 10px",
+  };
+
+  const activeNavLinkStyle = {
+    ...navLinkStyle,
+    fontWeight: "bold",
+    textDecoration: "underline",
+  };
+
+  // Basic Navbar for non-authenticated users
+  const BasicNavbar = () => (
     <Navbar style={navbarStyle} expand="md">
       <Container fluid="md">
-        <Navbar.Brand href="#home">
+        <Navbar.Brand as={Link} to="/home">
           <img
             src={Logo}
             alt="GiziBalita Logo"
-            className=" max-w-[120px] h-auto mb-[10px] transition-all duration-300  xs:max-w-[100px]"
+            className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
           />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -42,55 +64,35 @@ function BasicExample() {
           style={{ backgroundColor: "#FFB4B4" }}
         >
           <Nav className="ms-auto align-items-center">
-            <Nav.Link href="/dashboard">
-              <h5 style={{ color: "white" }}>Home</h5>
-            </Nav.Link>
-            <Nav.Link href="/">
-              <h5 style={{ color: "white" }}>About</h5>
-            </Nav.Link>
+            <Link
+              to="/dashboard"
+              style={
+                activeLink === "/dashboard" ? activeNavLinkStyle : navLinkStyle
+              }
+            >
+              <h5>Home</h5>
+            </Link>
+            <Link
+              to="/"
+              style={activeLink === "/" ? activeNavLinkStyle : navLinkStyle}
+            >
+              <h5>About</h5>
+            </Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>
   );
-}
-
-export default function NavbarComp(props) {
-  let login_data;
-  if (typeof window !== "undefined") {
-    login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
-  }
-  const { isLogin, admin, posyandu, desa, kader, tenkes } = props;
-  let navigate = useNavigate();
-  const [user, setUser] = useState(login_data);
-  const [activeLink, setActiveLink] = useState("");
-
-  useEffect(() => {
-    const currentPath = window.location.pathname;
-    setActiveLink(currentPath);
-  }, []);
 
   if (isLogin) {
     return (
-      <Navbar
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFB4B4",
-          color: "#ffffff",
-          height: "80px",
-          paddingTop: "20px",
-          zIndex: 1000, // Added z-index
-        }}
-        expand="lg"
-      >
-        <Container>
-          <Navbar.Brand href="#home">
+      <Navbar style={navbarStyle} expand="lg">
+        <Container fluid="md">
+          <Navbar.Brand as={Link} to="/home">
             <img
               src={Logo}
               alt="GiziBalita Logo"
-              className=" max-w-[120px] h-auto mb-[10px] transition-all duration-300  xs:max-w-[100px]"
+              className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
             />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -100,70 +102,86 @@ export default function NavbarComp(props) {
             style={{ backgroundColor: "#FFB4B4" }}
           >
             <Nav className="mx-auto align-items-center">
-              {user.user.role === "ORANG_TUA" && (
+              {user?.user?.role === "ORANG_TUA" && (
                 <>
-                  <Nav.Link
-                    href="/dashboard"
-                    className={`nav-link ${
-                      activeLink === "/dashboard" ? "active" : ""
-                    }`}
+                  <Link
+                    to="/dashboard"
+                    style={
+                      activeLink === "/dashboard"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Home</h6>
-                  </Nav.Link>
-                  <Nav.Link
-                    href="/artikel"
-                    className={`nav-link ${activeLink === "/" ? "active" : ""}`}
+                  </Link>
+                  <Link
+                    to="/artikel"
+                    style={
+                      activeLink === "/artikel"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Artikel</h6>
-                  </Nav.Link>
-                  <Nav.Link
-                    href="/forum"
-                    className={`nav-link ${
-                      activeLink === "/forum" ? "active" : ""
-                    }`}
+                  </Link>
+                  <Link
+                    to="/forum"
+                    style={
+                      activeLink === "/forum"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Forum</h6>
-                  </Nav.Link>
+                  </Link>
                 </>
               )}
-              {user.user.role === "TENAGA_KESEHATAN" && (
+              {user?.user?.role === "TENAGA_KESEHATAN" && (
                 <>
-                  <Nav.Link
-                    href="/tenaga-kesehatan/dashboard"
-                    className={`nav-link ${
-                      activeLink === "/dashboard" ? "active" : ""
-                    }`}
+                  <Link
+                    to="/tenaga-kesehatan/dashboard"
+                    style={
+                      activeLink === "/tenaga-kesehatan/dashboard"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Home</h6>
-                  </Nav.Link>
-                  <Nav.Link
-                    href="/forum"
-                    className={`nav-link ${
-                      activeLink === "/forum" ? "active" : ""
-                    }`}
+                  </Link>
+                  <Link
+                    to="/forum"
+                    style={
+                      activeLink === "/forum"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Forum</h6>
-                  </Nav.Link>
+                  </Link>
                 </>
               )}
-              {user.user.role === "DESA" && (
+              {user?.user?.role === "DESA" && (
                 <>
-                  <Nav.Link
-                    href="/desa/dashboard"
-                    className={`nav-link ${
-                      activeLink === "/dashboard" ? "active" : ""
-                    }`}
+                  <Link
+                    to="/desa/dashboard"
+                    style={
+                      activeLink === "/desa/dashboard"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Home</h6>
-                  </Nav.Link>
-                  <Nav.Link
-                    href="/desa/reminder"
-                    className={`nav-link ${
-                      activeLink === "/forum" ? "active" : ""
-                    }`}
+                  </Link>
+                  <Link
+                    to="/desa/reminder"
+                    style={
+                      activeLink === "/desa/reminder"
+                        ? activeNavLinkStyle
+                        : navLinkStyle
+                    }
                   >
                     <h6 className="nav-link-text">Event</h6>
-                  </Nav.Link>
+                  </Link>
                 </>
               )}
             </Nav>
@@ -171,12 +189,14 @@ export default function NavbarComp(props) {
             <Row justify="center" align="middle">
               <Col>
                 <Row justify="end" style={{ fontWeight: "bold" }}>
-                  {user && user.user.name}
+                  {user?.user?.name || "User"}
                 </Row>
                 <Row justify="end">
-                  {user && user.user.role.toLowerCase() === "orang_tua"
-                    ? "Orang tua"
-                    : user && user.user.role.toLowerCase()}
+                  {user?.user?.role
+                    ? user.user.role.toLowerCase() === "orang_tua"
+                      ? "Orang Tua"
+                      : user.user.role
+                    : "Guest"}
                 </Row>
               </Col>
               <Col>
@@ -190,8 +210,8 @@ export default function NavbarComp(props) {
                 <button
                   className="Btn"
                   onClick={() => {
-                    navigate("/");
                     localStorage.removeItem("login_data");
+                    navigate("/");
                   }}
                   style={{ marginLeft: "20px" }}
                 >
@@ -212,25 +232,13 @@ export default function NavbarComp(props) {
 
   if (admin) {
     return (
-      <Navbar
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFB4B4",
-          color: "#ffffff",
-          height: "80px",
-          paddingTop: "20px",
-          zIndex: 1000, // Added z-index
-        }}
-        expand="lg"
-      >
-        <Container>
-          <Navbar.Brand href="#home">
+      <Navbar style={navbarStyle} expand="lg">
+        <Container fluid="md">
+          <Navbar.Brand as={Link} to="/home">
             <img
               src={Logo}
               alt="GiziBalita Logo"
-              className=" max-w-[120px] h-auto mb-[10px] transition-all duration-300  xs:max-w-[100px]"
+              className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
             />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -241,106 +249,130 @@ export default function NavbarComp(props) {
           >
             {desa && (
               <Nav className="mx-auto align-items-center">
-                <Nav.Link
-                  href="/dashboard"
-                  className={`nav-link ${
-                    activeLink === "/dashboard" ? "active" : ""
-                  }`}
+                <Link
+                  to="/dashboard"
+                  style={
+                    activeLink === "/dashboard"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Home</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/artikel"
-                  className={`nav-link ${activeLink === "/" ? "active" : ""}`}
+                </Link>
+                <Link
+                  to="/artikel"
+                  style={
+                    activeLink === "/artikel"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Input Data</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/forum"
-                  className={`nav-link ${
-                    activeLink === "/forum" ? "active" : ""
-                  }`}
+                </Link>
+                <Link
+                  to="/forum"
+                  style={
+                    activeLink === "/forum" ? activeNavLinkStyle : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Desa</h6>
-                </Nav.Link>
+                </Link>
               </Nav>
             )}
             {posyandu && (
               <Nav className="mx-auto align-items-center">
-                <Nav.Link
-                  href="/dashboard"
-                  className={`nav-link ${
-                    activeLink === "/dashboard" ? "active" : ""
-                  }`}
+                <Link
+                  to="/dashboard"
+                  style={
+                    activeLink === "/dashboard"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Home</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/artikel"
-                  className={`nav-link ${activeLink === "/" ? "active" : ""}`}
+                </Link>
+                <Link
+                  to="/artikel"
+                  style={
+                    activeLink === "/artikel"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Input Data</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/forum"
-                  className={`nav-link ${
-                    activeLink === "/forum" ? "active" : ""
-                  }`}
+                </Link>
+                <Link
+                  to="/forum"
+                  style={
+                    activeLink === "/forum" ? activeNavLinkStyle : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Posyandu</h6>
-                </Nav.Link>
+                </Link>
               </Nav>
             )}
             {kader && (
               <Nav className="mx-auto align-items-center">
-                <Nav.Link
-                  href="/dashboard"
-                  className={`nav-link ${
-                    activeLink === "/dashboard" ? "active" : ""
-                  }`}
+                <Link
+                  to="/dashboard"
+                  style={
+                    activeLink === "/dashboard"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Home</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/artikel"
-                  className={`nav-link ${activeLink === "/" ? "active" : ""}`}
+                </Link>
+                <Link
+                  to="/artikel"
+                  style={
+                    activeLink === "/artikel"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Register Akun</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/forum"
-                  className={`nav-link ${
-                    activeLink === "/forum" ? "active" : ""
-                  }`}
+                </Link>
+                <Link
+                  to="/forum"
+                  style={
+                    activeLink === "/forum" ? activeNavLinkStyle : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Kader Posyandu</h6>
-                </Nav.Link>
+                </Link>
               </Nav>
             )}
             {tenkes && (
               <Nav className="mx-auto align-items-center">
-                <Nav.Link
-                  href="/tenaga-kesehatan/dashboard"
-                  className={`nav-link ${
-                    activeLink === "/dashboard" ? "active" : ""
-                  }`}
+                <Link
+                  to="/tenaga-kesehatan/dashboard"
+                  style={
+                    activeLink === "/tenaga-kesehatan/dashboard"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Home</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/artikel"
-                  className={`nav-link ${activeLink === "/" ? "active" : ""}`}
+                </Link>
+                <Link
+                  to="/artikel"
+                  style={
+                    activeLink === "/artikel"
+                      ? activeNavLinkStyle
+                      : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Register Akun</h6>
-                </Nav.Link>
-                <Nav.Link
-                  href="/forum"
-                  className={`nav-link ${
-                    activeLink === "/forum" ? "active" : ""
-                  }`}
+                </Link>
+                <Link
+                  to="/forum"
+                  style={
+                    activeLink === "/forum" ? activeNavLinkStyle : navLinkStyle
+                  }
                 >
                   <h6 className="nav-link-text">Tenaga Kesehatan</h6>
-                </Nav.Link>
+                </Link>
               </Nav>
             )}
           </Navbar.Collapse>
@@ -349,5 +381,5 @@ export default function NavbarComp(props) {
     );
   }
 
-  return <BasicExample />;
+  return <BasicNavbar />;
 }

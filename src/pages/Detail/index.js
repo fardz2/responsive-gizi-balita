@@ -1121,8 +1121,8 @@ export default function Detail() {
     <>
       <Navbar isLogin />
       <BackgroundComponent />
-      <div className="flex flex-col items-center p-4 sm:p-6 lg:p-8 w-full justify-center">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px] items-center justify-center lg:h-[350px] h-auto mt-16 ">
+      <div className="flex flex-col items-center p-3 sm:p-6 lg:p-8 w-full justify-center">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px]  lg:h-[350px] h-auto mt-16 ">
           <div className="flex-1 text-left">
             <h6 className="dashboard text-2xl lg:text-5xl">{dataAnak.nama}</h6>
             <h6 className="dashboard text-2xl lg:text-5xl">{`${moment().diff(
