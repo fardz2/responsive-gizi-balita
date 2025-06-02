@@ -1,187 +1,146 @@
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../../components/layout/Navbar";
-import '../Dashboard/dashboard-style.css';
 import bg_dashboard from "../../assets/img/bg-dashboard.svg";
-import Container from 'react-bootstrap/Container';
-import Image from 'react-bootstrap/Image';
-import headline_news from "../../assets/img/headline-artikel.png";
-import { formatDate2, limitWords } from '../../utilities/Format';
-
-
-
+import { formatDate2, limitWords } from "../../utilities/Format";
+import { Spin } from "antd";
 
 const BackgroundComponent = () => {
-  const backgroundStyles = {
-    position: "absolute",
-    top: 80,
-    left: -5,
-    width: "100vw",
-    height: '40%',
-    zIndex: -10000,
-    background: `url(${bg_dashboard}) no-repeat center`,
-    backgroundSize: '100vw auto',
-    borderRadius: "0 0 50px 50px",
-    boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.19)"
-  };
-  return <div style={backgroundStyles} />;
+  return (
+    <div
+      className="absolute top-20 left-0 w-full h-[30vh] -z-10 bg-no-repeat bg-center bg-cover rounded-b-3xl shadow-lg"
+      style={{ backgroundImage: `url(${bg_dashboard})` }}
+    />
+  );
 };
 
 export default function Artikel() {
-  let login_data;
-  if (typeof window !== "undefined") {
-    login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
-  }
-
-  // eslint-disable-next-line
-  const [user, setUser] = useState(login_data);
-  const [isOpenModalInputDataAnak, setIsOpenModalInputDataAnak] =
-    useState(false);
-  const [isOpenModalUpdateDataAnak, setIsOpenModalUpdateDataAnak] =
-    useState(false);
+  const [user, setUser] = useState(() => {
+    if (typeof window !== "undefined") {
+      return JSON.parse(localStorage.getItem("login_data")) || {};
+    }
+    return {};
+  });
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [dataAnak, setDataAnak] = useState(null);
-  const [dataSorted, setDataSorted] = useState([]);
+  const [dataSorted, setDataSorted] = useState(null);
   const [dataKategori, setDataKategori] = useState([]);
 
   useEffect(() => {
-    function fetchDataAnak() {
-
-      axios
-        .get(`${process.env.REACT_APP_BASE_URL}/api/artikel`, {
-          headers: { Authorization: `Bearer ${user.token.value}` },
-        })
-        .then((response) => {
-          setData(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          console.log(err);
-        });
-
-    }
-
-    fetchDataAnak();
-    // eslint-disable-next-line
-  }, [refreshKey]);
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/artikel`,
-        {
-          headers: { Authorization: `Bearer ${user.token.value}` },
-        })
-
-      .then((response) => {
+    const fetchDataAnak = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/api/artikel`,
+          {
+            headers: { Authorization: `Bearer ${user.token?.value}` },
+          }
+        );
         const sortedData = response.data.data;
         setData(sortedData);
         setDataSorted(sortedData[sortedData.length - 1]);
-        // setDataSorted(sortedData[0]);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
+        console.error("Error fetching articles:", err);
         setIsLoading(false);
-      });
+      }
+    };
 
+    fetchDataAnak();
+  }, [refreshKey, user.token?.value]);
 
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/kategori`,
-        {
-          headers: { Authorization: `Bearer ${user.token.value}` },
-        })
-
-      .then((response) => {
-        setDataKategori(response.data.data)
+  useEffect(() => {
+    const fetchKategori = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/api/kategori`,
+          {
+            headers: { Authorization: `Bearer ${user.token?.value}` },
+          }
+        );
+        setDataKategori(response.data.data);
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
+        console.error("Error fetching categories:", err);
         setIsLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  console.log(dataSorted)
-  console.log(dataKategori)
-  console.log(data)
+    fetchKategori();
+  }, [user.token?.value]);
+
   return (
     <>
       <Navbar isLogin />
-      {
-        dataSorted &&
-
-        // return <div className="container">tidak adas</div>;
-        <div className="container">
-          <div className="row pl-32 pr-32 py-5" key={dataSorted.id}>
-            <div className="col-md-18 justify-self-auto">
-              <h1 className='text-3xl'>{dataSorted.judul}</h1>
-              <p className='text-gray-400'>{dataSorted.penulis} {' / '} {formatDate2(dataSorted.updated_at)}</p>
-              <img src={'https://api.gizibalita.com/img/' + dataSorted.image} className='max-w-full' />
-
-              <div className="grid grid-cols-4 gap-4">
-                <div className='col-span-3'>
-                  <div dangerouslySetInnerHTML={{ __html: dataSorted.content }} className='mt-4' />
+      <BackgroundComponent />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isLoading ? (
+          <div className="flex justify-center ">
+            <Spin size="large" spinning={isLoading} />
+          </div>
+        ) : dataSorted ? (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="w-full lg:w-2/3">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-3">
+                {dataSorted.judul}
+              </h1>
+              <p className="text-gray-500 mb-4">
+                {dataSorted.penulis} / {formatDate2(dataSorted.updated_at)}
+              </p>
+              <img
+                src={`${process.env.REACT_APP_BASE_URL}/public/img/${dataSorted.image}`}
+                alt={dataSorted.judul}
+                className="w-full h-auto rounded-lg mb-4"
+              />
+              <div
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: dataSorted.content }}
+              />
+            </div>
+            <div className="w-full lg:w-1/3">
+              <div className="border-l-2 border-gray-300 pl-4">
+                <div className="flex items-center mb-4">
+                  <div className="h-5 w-1 bg-red-500 mr-2"></div>
+                  <h2 className="text-lg font-semibold">Berita Lainnya</h2>
                 </div>
-                <div class="flex my-4 space-x-6">
-                  <div class="h-full border-r-2 border-gray-300"></div>
-                  <div>
-                    <div className='flex flex-row'>
-                      <div class="h-4 border-r-2 border-red-500 mr-2"></div>
-                      <h1>Berita Lainnya</h1>
+                {dataKategori.map((kategori) => {
+                  const relatedArticles = data.filter(
+                    (item) => item.kategori === kategori.name
+                  );
+                  return (
+                    <div key={kategori.id} className="mb-6">
+                      {relatedArticles.map((article, index) => (
+                        <div key={index} className="mb-4">
+                          <h4 className="text-base font-medium">
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setDataSorted(article);
+                              }}
+                              className="text-gray-800 hover:text-red-500"
+                            >
+                              {article.judul}
+                            </a>
+                          </h4>
+                          <div
+                            className="text-sm text-gray-500"
+                            dangerouslySetInnerHTML={{
+                              __html: limitWords(article.content, 15),
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
-                    {
-                      dataKategori.map((kategoris) => {
-                        const dataNextArtikel = data.filter(data => data.kategori === kategoris.name);
-                        console.log(dataNextArtikel)
-                        return (
-                          <div>
-                            <div className='mt-4 flex' key={kategoris.id}>
-                              <hr class="w-8 border-t-4" style={{ marginTop: "9px", marginRight: "5px", color: "red" }}></hr>
-                              <h1 style={{ fontSize: "16px", textTransform: "uppercase" }}>{kategoris.name}</h1>
-                            </div>
-                            {
-
-                              dataNextArtikel.map((dataNextArtikel, index) => (
-                                <div key={index}>
-                                  <h1 style={{ fontSize: "14px", marginTop: "10px" }}>{dataNextArtikel.judul}</h1>
-                                  <a onClick={(e) => {
-                                    e.preventDefault();
-                                    setDataSorted(dataNextArtikel);
-                                  }}>
-                                    <div className='justify-normal' dangerouslySetInnerHTML={{ __html: limitWords(dataNextArtikel.content, 15) }} />
-                                  </a>
-                                </div>
-                              ))
-                            }
-
-                          </div>
-                        )
-                      })
-                    }
-                    {/* {
-                              data.map((data) => (
-                                <div >
-                                  <h1 style={{fontSize: "14px", marginTop: "10px"}}>{data.judul}</h1>
-                                  <div dangerouslySetInnerHTML={{ __html: limitWords(data.content, 20) }} />
-                                </div>
-                              ))
-                            } */}
-
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-
-
             </div>
           </div>
-        </div>
-
-      }
-
+        ) : (
+          <p className="text-center text-gray-500">No articles available.</p>
+        )}
+      </div>
     </>
   );
 }

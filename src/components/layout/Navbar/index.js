@@ -148,16 +148,6 @@ export default function NavbarComp(props) {
                   >
                     <h6 className="nav-link-text">Home</h6>
                   </Link>
-                  <Link
-                    to="/forum"
-                    style={
-                      activeLink === "/forum"
-                        ? activeNavLinkStyle
-                        : navLinkStyle
-                    }
-                  >
-                    <h6 className="nav-link-text">Forum</h6>
-                  </Link>
                 </>
               )}
               {user?.user?.role === "DESA" && (

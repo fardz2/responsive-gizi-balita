@@ -1,29 +1,28 @@
-import { 
-  Button, 
-  Col, 
-  Form, 
-  Input, 
-  message, 
-  Modal, 
-  Row, 
-  Select, 
-  Table 
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Table,
 } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Container from 'react-bootstrap/Container';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import Container from "react-bootstrap/Container";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import FormUpdateDataArtikel from "../../components/form/FormUpdateDataArtikel";
 import { formatDate2 } from "../../utilities/Format";
 import { FiRotateCcw } from "react-icons/fi";
-import ReactSelect from 'react-select';
 
 export default function ArtikelAdmin() {
   let login_data;
   if (typeof window !== "undefined") {
-    login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
+    login_data = JSON.parse(localStorage.getItem("login_data")) || {};
   }
   const [user, setUser] = useState(login_data);
   const [form] = Form.useForm();
@@ -34,112 +33,111 @@ export default function ArtikelAdmin() {
   const [dataSource, setDataSource] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dataArtikel, setDataArtikel] = useState(null);
-  const [valueContent, setValueContent] = useState('');
-  const [statePage, setStatePage] = useState('');
-  const [isOpenModalUpdateDataArtikel, setIsOpenModalUpdateDataArtikel] = useState(false);
+  const [valueContent, setValueContent] = useState("");
+  const [statePage, setStatePage] = useState("Artikel");
+  const [isOpenModalUpdateDataArtikel, setIsOpenModalUpdateDataArtikel] =
+    useState(false);
   const [searchText, setSearchedText] = useState("");
-
   const [statePageKateogries, setStatePageKateogries] = useState(false);
-  
-   const onFinish = (values) => {
-    console.log(values);
-    if(!statePageKateogries){
-      if(imageFile){
-        let formData = new FormData();
-        formData.append('judul', values.judul);
-        formData.append('kategori', values.kategori);
-        formData.append('penulis', values.penulis);
-        formData.append('content', valueContent);
-        formData.append('image', imageFile);
 
-        console.log(formData)
+  const onFinish = (values) => {
+    if (!statePageKateogries) {
+      if (imageFile) {
+        let formData = new FormData();
+        formData.append("judul", values.judul);
+        formData.append("kategori", values.kategori);
+        formData.append("penulis", values.penulis);
+        formData.append("content", valueContent);
+        formData.append("image", imageFile);
+
         axios
-        .post(`${process.env.REACT_APP_BASE_URL}/api/artikel`,formData,{
-            headers: { Authorization: `Bearer ${user.token.value}` },
-            'Content-Type': 'multipart/form',
+          .post(`${process.env.REACT_APP_BASE_URL}/api/artikel`, formData, {
+            headers: {
+              Authorization: `Bearer ${user.token?.value}`,
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then(() => {
+            setRefreshKey((oldKey) => oldKey + 1);
+            messageApi.open({
+              type: "success",
+              content: "Data berhasil tersimpan",
+            });
+            form.resetFields();
+            setValueContent("");
+            setImageFile(null);
+          })
+          .catch((err) => {
+            console.error(err);
+            messageApi.open({
+              type: "error",
+              content: "Data gagal tersimpan",
+            });
+          });
+      }
+    } else {
+      axios
+        .post(`${process.env.REACT_APP_BASE_URL}/api/kategori`, values, {
+          headers: { Authorization: `Bearer ${user.token?.value}` },
         })
-        .then((response) => {
+        .then(() => {
           setRefreshKey((oldKey) => oldKey + 1);
           messageApi.open({
             type: "success",
             content: "Data berhasil tersimpan",
-          })
+          });
           form.resetFields();
-          setValueContent('');
-          setImageFile(null)
+          setValueContent("");
+          setImageFile(null);
         })
         .catch((err) => {
+          console.error(err);
           messageApi.open({
             type: "error",
             content: "Data gagal tersimpan",
           });
         });
-      }
-    } else {
-      axios
-      .post(`${process.env.REACT_APP_BASE_URL}/api/kategori`,values,{
-          headers: { Authorization: `Bearer ${user.token.value}` },
-      })
-      .then((response) => {
-        setRefreshKey((oldKey) => oldKey + 1);
-        messageApi.open({
-          type: "success",
-          content: "Data berhasil tersimpan",
-        })
-        form.resetFields();
-        setValueContent('');
-        setImageFile(null)
-      })
-      .catch((err) => {
-        messageApi.open({
-          type: "error",
-          content: "Data gagal tersimpan",
-        });
-      });
     }
-    
   };
 
   const onFinishFailed = (values) => {
     console.log(values);
   };
 
-   const columns = [
+  const columns = [
     {
       title: "Judul Berita",
       dataIndex: "judul",
       key: "judul",
-       filteredValue: [searchText],
+      filteredValue: [searchText],
       onFilter: (value, record) => {
-        return String(record.judul).toLowerCase().includes(value.toLowerCase())
-      }
+        return String(record.judul).toLowerCase().includes(value.toLowerCase());
+      },
     },
-     {
+    {
       title: "Tanggal Upload",
       dataIndex: "kategori",
       key: "kategori",
-      render: (_, record) => (
-        formatDate2(record.updated_at)
-      )
+      render: (_, record) => formatDate2(record.updated_at),
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <div className="flex">
-           <button 
-              type="button"
-              className="buttonUpdateArtikel" 
-              onClick={() => {
-                setDataArtikel(record);
-                setIsOpenModalUpdateDataArtikel(true);
-              }}
-            >
+          <button
+            type="button"
+            className="buttonUpdateArtikel"
+            onClick={() => {
+              setDataArtikel(record);
+              setIsOpenModalUpdateDataArtikel(true);
+            }}
+          >
             Update
           </button>
-          <button 
-           type="button"
-           className="buttonDeleteArtikel" 
+          <button
+            type="button"
+            className="buttonDeleteArtikel"
             onClick={() => {
               Modal.confirm({
                 title: "Apakah anda yakin?",
@@ -148,9 +146,9 @@ export default function ArtikelAdmin() {
                 okText: "Ya",
                 cancelText: "Tidak",
                 onOk: () => {
-                  deleteDesa(record.id)
+                  deleteDesa(record.id);
                 },
-              })
+              });
             }}
           >
             Delete
@@ -160,59 +158,50 @@ export default function ArtikelAdmin() {
     },
   ];
 
-  console.log(dataSource)
-   useEffect(() => {
+  useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/artikel`,
-      {
-          headers: { Authorization: `Bearer ${user.token.value}` },
+      .get(`${process.env.REACT_APP_BASE_URL}/api/artikel`, {
+        headers: { Authorization: `Bearer ${user.token?.value}` },
       })
-      
       .then((response) => {
         setDataSource(response.data.data);
         setIsLoading(false);
         setStatePage("Artikel");
-        setStatePageKateogries(false)
-      })
-      .catch((err) => {
-        setIsLoading(false);
-      });
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/kategori`,
-      {
-          headers: { Authorization: `Bearer ${user.token.value}` },
-      })
-      
-      .then((response) => {
-        setDataKategori(response.data.data);
-        setIsLoading(false);
         setStatePageKateogries(false);
       })
       .catch((err) => {
+        console.error(err);
         setIsLoading(false);
       });
-    // eslint-disable-next-line
-  }, [refreshKey]);
+
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/kategori`, {
+        headers: { Authorization: `Bearer ${user.token?.value}` },
+      })
+      .then((response) => {
+        setDataKategori(response.data.data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(false);
+      });
+  }, [refreshKey, user.token?.value]);
 
   function deleteDesa(id) {
     axios
-      .delete(`${process.env.REACT_APP_BASE_URL}/api/artikel/${id}`,{
-          headers: { Authorization: `Bearer ${user.token.value}` },
+      .delete(`${process.env.REACT_APP_BASE_URL}/api/artikel/${id}`, {
+        headers: { Authorization: `Bearer ${user.token?.value}` },
       })
-      .then((response) => {
+      .then(() => {
         messageApi.open({
           type: "success",
           content: "Data berhasil dihapus",
         });
-        setTimeout(() => {
-          setRefreshKey((oldKey) => oldKey + 1);
-          window.location.reload();
-          setValueContent('');
-          fetch();
-        }, 1000);
+        setRefreshKey((oldKey) => oldKey + 1);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         messageApi.open({
           type: "error",
           content: "Data gagal dihapus",
@@ -222,32 +211,40 @@ export default function ArtikelAdmin() {
 
   return (
     <>
-      <Container fluid style={{ backgroundColor: "white", padding: "20px", borderRadius: "20px" }}>
+      <Container
+        fluid
+        style={{
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "20px",
+        }}
+      >
         {contextHolder}
         <Row justify="space-between">
           <Col span={24}>
-            <div style={{justifyContent:"center", display:"flex", marginBottom: "20px"}}>
-              <button 
-                class="button_kirim"
-                onClick={() => {
-                  setStatePage("Artikel");
-                }}
+            <div
+              style={{
+                justifyContent: "center",
+                display: "flex",
+                marginBottom: "20px",
+              }}
+            >
+              <button
+                className="button_kirim"
+                onClick={() => setStatePage("Artikel")}
               >
-                  Artikel
+                Artikel
               </button>
-              <button 
-                class="button_kirim"
-                onClick={() => {
-                  setStatePage("Riwayat");
-                }}
+              <button
+                className="button_kirim"
+                onClick={() => setStatePage("Riwayat")}
               >
                 Riwayat
               </button>
             </div>
           </Col>
-          <Col sm={24}>
-            {
-              statePage === "Artikel" ? ( 
+          <Col span={24}>
+            {statePage === "Artikel" ? (
               <Form
                 form={form}
                 name="basic"
@@ -260,38 +257,35 @@ export default function ArtikelAdmin() {
                   label="Pilih kategori"
                   name="kategori"
                   rules={[
-                    {
-                      required: true,
-                      message: "Kategori masih kosong!",
-                    },
+                    { required: true, message: "Kategori masih kosong!" },
                   ]}
                 >
-                  <Select size="4" listHeight={100} optionFilterProp="children" showSearch placeholder="Pilih Kategori">
-
+                  <Select
+                    size="4"
+                    listHeight={100}
+                    optionFilterProp="children"
+                    showSearch
+                    placeholder="Pilih Kategori"
+                  >
                     <Select.Option value="add">
-                      <Button onClick={() => {
-                        setStatePageKateogries(true)
-                        
-                      }}>Tambah Kategori</Button>
+                      <Button onClick={() => setStatePageKateogries(true)}>
+                        Tambah Kategori
+                      </Button>
                     </Select.Option>
-
-                    {
-                      statePageKateogries ?  
-                      <Select.Option>
-                      </Select.Option> :
-                    dataKategori.map((item) => (
-                     
-                      <Select.Option key={item.id} value={item.name} >
-                        {item.name}
-                      </Select.Option>
-                    ))
-                    }
+                    {statePageKateogries ? (
+                      <Select.Option></Select.Option>
+                    ) : (
+                      dataKategori.map((item) => (
+                        <Select.Option key={item.id} value={item.name}>
+                          {item.name}
+                        </Select.Option>
+                      ))
+                    )}
                   </Select>
                 </Form.Item>
-                {
-                  statePageKateogries &&
+                {statePageKateogries && (
                   <Form.Item
-                    style={{ Width: "100%" }}
+                    style={{ width: "100%" }}
                     label="Tambah Kategori"
                     name="name"
                     rules={[
@@ -301,162 +295,173 @@ export default function ArtikelAdmin() {
                       },
                     ]}
                   >
-                    <Input placeholder="Masukkan Nama Kategori"/>
+                    <Input placeholder="Masukkan Nama Kategori" />
                   </Form.Item>
-                }
-                
-                {
-                  !statePageKateogries &&
-                  <div>
+                )}
+                {!statePageKateogries && (
+                  <>
                     <Form.Item
-                    style={{ Width: "100%" }}
-                    label="Judul"
-                    name="judul"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Judul masih kosong!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Masukkan judul"/>
-                  </Form.Item>
-                  <Form.Item
-                    style={{ Width: "100%" }}
-                    label="Nama penulis"
-                    name="penulis"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Penulis masih kosong!",
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    style={{ Width: "100%" }}
-                    label="Unggah cover artikel"
-                    name="image"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Cover masih kosong!",
-                      },
-                    ]}
-                >
-                
-                <div className="flex justify-center items-center w-full">
-                    <label
-                      htmlFor="import_pelanggan"
-                      className="flex flex-col justify-center items-center w-full h-64 bg-white rounded-lg border-2 border-dashed cursor-pointer dark:hover:bg-bray-800" style={{borderColor: "#FFB4B4"}}
+                      style={{ width: "100%" }}
+                      label="Judul"
+                      name="judul"
+                      rules={[
+                        { required: true, message: "Judul masih kosong!" },
+                      ]}
                     >
-                    
-                    {imageFile ? (
-                      <div className="flex flex-col justify-center items-center w-full h-full">
-                        {imageFile?.name}
+                      <Input placeholder="Masukkan judul" />
+                    </Form.Item>
+                    <Form.Item
+                      style={{ width: "100%" }}
+                      label="Nama penulis"
+                      name="penulis"
+                      rules={[
+                        { required: true, message: "Penulis masih kosong!" },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      style={{ width: "100%" }}
+                      label="Unggah cover artikel"
+                      name="image"
+                      rules={[
+                        { required: true, message: "Cover masih kosong!" },
+                      ]}
+                    >
+                      <div className="flex justify-center items-center w-full">
+                        <label
+                          htmlFor="import_pelanggan"
+                          className="flex flex-col justify-center items-center w-full h-64 bg-white rounded-lg border-2 border-dashed cursor-pointer"
+                          style={{ borderColor: "#FFB4B4" }}
+                        >
+                          {imageFile ? (
+                            <div className="flex flex-col justify-center items-center w-full h-full">
+                              {imageFile?.name}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col justify-center items-center pt-5 pb-6">
+                              <svg
+                                aria-hidden="true"
+                                className="mb-3 w-10 h-10 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                ></path>
+                              </svg>
+                              <p
+                                className="mb-2 text-sm"
+                                style={{ color: "#b41318" }}
+                              >
+                                <span className="font-semibold">
+                                  Click to upload
+                                </span>{" "}
+                                or drag and drop
+                              </p>
+                              <p
+                                className="text-xs"
+                                style={{ color: "#b41318" }}
+                              >
+                                Unggah Cover Digital
+                              </p>
+                            </div>
+                          )}
+                          <input
+                            id="import_pelanggan"
+                            type="file"
+                            accept=".jpg, .jpeg, .png"
+                            style={{ color: "#b41318" }}
+                            onChange={(e) => setImageFile(e.target.files[0])}
+                          />
+                        </label>
                       </div>
-                    ) : (
-                        <div className="flex flex-col justify-center items-center pt-5 pb-6">
-                          <svg
-                            aria-hidden="true"
-                            className="mb-3 w-10 h-10 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            ></path>
-                          </svg>
-                          <p className="mb-2 text-sm dark:text-gray-400" style={{color: "#b41318"}}>
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{' '}
-                              or drag and drop
-                            </p>
-                            <p className="text-xs" style={{color: "#b41318"}}>
-                              Unggah Cover Digital
-                            </p>
-                        </div>
-                    )}
-                    <input
-                      id="import_pelanggan"
-                      type="file"
-                      accept=".jpg, .jpeg, .png"
-                      style={{color: "#b41318"}}
-                        onChange={(e) => {
-                          setImageFile(e.target.files[0]);
-                        }}
-                    />
-                  </label>
-                </div>
-                </Form.Item>
-                <Form.Item
-                  style={{ Width: "100%", flexDirection: "row"}}
-                  label="Paragraf"
-                  name="content"
-                >
-                  
-                </Form.Item>
-                <ReactQuill theme="snow" value={valueContent} onChange={setValueContent} />;
-                  </div>
-                }
-                  
-                
+                    </Form.Item>
+                    <Form.Item
+                      style={{ width: "100%", flexDirection: "row" }}
+                      label="Paragraf"
+                      name="content"
+                    >
+                      <ReactQuill
+                        theme="snow"
+                        value={valueContent}
+                        onChange={setValueContent}
+                      />
+                    </Form.Item>
+                  </>
+                )}
                 <Col span={24} align="center">
                   <Form.Item>
-                    {/* <button type="button" class="button_kirim mx-5">
-                      Kirim
-                    </button> */}
-                    <Button type="primary" htmlType="submit">
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      className="button_kirim mx-5"
+                    >
                       {statePageKateogries ? "Tambah" : "Kirim"}
                     </Button>
-                    {
-                      statePageKateogries &&
-                      <Button type="primary" htmlType="submit" onClick={() => {
-                        setStatePageKateogries(false)
-                      }}>
+                    {statePageKateogries && (
+                      <Button
+                        type="primary"
+                        className="button_kirim mx-5"
+                        onClick={() => setStatePageKateogries(false)}
+                      >
                         Batal
                       </Button>
-                    }
-                    
+                    )}
                   </Form.Item>
                 </Col>
               </Form>
-              ) : (
-                !isLoading && (
+            ) : (
+              !isLoading && (
+                <div className="overflow-x-auto">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-sm font-semibold">Daftar Artikel</h2>
+                    <Input.Search
+                      placeholder="Search here ..."
+                      onSearch={(value) => setSearchedText(value)}
+                      className="w-full sm:w-64"
+                    />
+                  </div>
                   <Table
-                    title={
-                      () => (
-                        <div className="flex justify-between items-center">
-                          <div className="flex justify-start items-center">
-                            <h2 className="text-sm font-semibold">Daftar Posyandu</h2>
-                          </div>
-                           <div className="flex justify-end items-center">
-                             <Input.Search
-                              placeholder="Search here ..."
-                              onSearch={(value) => {
-                                setSearchedText(value)
-                              }}
-                            />
-                          </div>
+                    title={() => (
+                      <div className="flex justify-between items-center">
+                        <div className="flex justify-start items-center">
+                          <h2 className="text-sm font-semibold">
+                            Daftar Artikel
+                          </h2>
                         </div>
-
-                      )
-                    }
+                        <div className="flex justify-end items-center">
+                          <Input.Search
+                            placeholder="Search here ..."
+                            onSearch={(value) => setSearchedText(value)}
+                            className="w-full sm:w-64"
+                          />
+                        </div>
+                      </div>
+                    )}
                     dataSource={dataSource}
                     columns={columns}
                     loading={isLoading}
                     pagination={{ pageSize: 5 }}
+                    className="w-full"
+                    scroll={{ x: "max-content" }}
                   />
-                )
+                  <div className="flex justify-center mt-4">
+                    <button
+                      className="button_kirim"
+                      onClick={() => setRefreshKey((oldKey) => oldKey + 1)}
+                    >
+                      <FiRotateCcw />
+                    </button>
+                  </div>
+                </div>
               )
-            }
+            )}
           </Col>
           <Col>
             <FormUpdateDataArtikel
@@ -465,45 +470,9 @@ export default function ArtikelAdmin() {
               fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
               data={dataArtikel}
             />
-           </Col>
+          </Col>
         </Row>
       </Container>
     </>
   );
 }
-
-
-// function ArtikelAdmin() {
-//   const [selectedOption, setSelectedOption] = useState('');
-//   const [showPopup, setShowPopup] = useState(false);
-
-//   const handleOptionChange = (e) => {
-//     setSelectedOption(e.target.value);
-//     setShowPopup(true);
-//   };
-
-//   const handlePopupClose = () => {
-//     setShowPopup(false);
-//   };
-
-//   return (
-//     <div>
-//       <h1>Pilih Opsi</h1>
-//       <select value={selectedOption} onChange={handleOptionChange}>
-//         <option value="">Pilih</option>
-//         <option value="option1">Opsi 1</option>
-//         <option value="option2">Opsi 2</option>
-//         <option value="option3">Opsi 3</option>
-//       </select>
-//       {showPopup && (
-//         <div>
-//           <h2>Pop-up</h2>
-//           <p>Anda memilih opsi: {selectedOption}</p>
-//           <button onClick={handlePopupClose}>Tutup</button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default ArtikelAdmin;
