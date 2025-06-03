@@ -5,7 +5,7 @@ import { UserOutlined } from "@ant-design/icons";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import Logo from "../../../assets/img/GiziBalita_logo.png";
+
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -51,11 +51,7 @@ export default function NavbarComp(props) {
     <Navbar style={navbarStyle} expand="md">
       <Container fluid="md">
         <Navbar.Brand as={Link} to="/home">
-          <img
-            src={Logo}
-            alt="GiziBalita Logo"
-            className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
-          />
+          <h2>KMS Digital Lebakwangi</h2>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse
@@ -89,11 +85,7 @@ export default function NavbarComp(props) {
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
           <Navbar.Brand as={Link} to="/home">
-            <img
-              src={Logo}
-              alt="GiziBalita Logo"
-              className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
-            />
+            <h2>KMS Digital Lebakwangi</h2>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
@@ -225,11 +217,7 @@ export default function NavbarComp(props) {
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
           <Navbar.Brand as={Link} to="/home">
-            <img
-              src={Logo}
-              alt="GiziBalita Logo"
-              className="max-w-[120px] h-auto mb-[10px] transition-all duration-300 xs:max-w-[100px]"
-            />
+            <h2>KMS Digital Lebakwangi</h2>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
