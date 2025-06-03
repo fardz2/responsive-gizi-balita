@@ -51,7 +51,7 @@ export default function NavbarComp(props) {
     <Navbar style={navbarStyle} expand="md">
       <Container fluid="md">
         <Navbar.Brand as={Link} to="/home">
-          <h2>KMS Digital Lebakwangi</h2>
+          <h2 className="text-xs md:text-xl">KMS Digital Lebakwangi</h2>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse
@@ -85,7 +85,7 @@ export default function NavbarComp(props) {
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
           <Navbar.Brand as={Link} to="/home">
-            <h2>KMS Digital Lebakwangi</h2>
+            <h2 className="text-xs md:text-xl">KMS Digital Lebakwangi</h2>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
@@ -217,7 +217,7 @@ export default function NavbarComp(props) {
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
           <Navbar.Brand as={Link} to="/home">
-            <h2>KMS Digital Lebakwangi</h2>
+            <h2 className="text-xs md:text-xl">KMS Digital Lebakwangi</h2>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse
