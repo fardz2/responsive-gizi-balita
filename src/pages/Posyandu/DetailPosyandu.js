@@ -129,6 +129,10 @@ export default function DetailPosyandu() {
     }
   }
 
+  const getPointRadius = () => {
+    return typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+  };
+
   const dataChartPriaBB = {
     labels: labels,
     datasets: [
@@ -138,7 +142,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -202,7 +206,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -266,7 +270,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -300,7 +304,7 @@ export default function DetailPosyandu() {
       {
         data: dataTinggiBadanByUmurPria.map((data) => data.SD1pos),
         borderColor: "rgb(234, 255, 0)",
-        backgroundColor: "rgba(238, 255, 0, 0.5)",
+        backgroundColor: "rgba(238, 255, 0.5)",
         type: "line",
         label: "SD +1",
       },
@@ -330,7 +334,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -394,7 +398,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -458,7 +462,7 @@ export default function DetailPosyandu() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {

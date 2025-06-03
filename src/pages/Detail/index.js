@@ -189,6 +189,10 @@ export default function Detail() {
     }
   }
 
+  const getPointRadius = () => {
+    return typeof window !== "undefined" && window.innerWidth < 640 ? 3 : 5;
+  };
+
   const dataChartPriaGizi_0_24 = {
     labels: label_PB_24,
     datasets: [
@@ -198,7 +202,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -262,7 +266,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -326,7 +330,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -390,7 +394,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -454,7 +458,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -518,7 +522,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -582,7 +586,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -646,7 +650,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -710,7 +714,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -774,7 +778,7 @@ export default function Detail() {
         borderColor: "black",
         type: "scatter",
         showLine: false,
-        pointRadius: 5,
+        pointRadius: getPointRadius,
         label: "Data Anak",
       },
       {
@@ -1210,7 +1214,7 @@ export default function Detail() {
       <Navbar isLogin />
       <BackgroundComponent />
       <div className="flex flex-col items-center p-3 sm:p-6 lg:p-8 w-full justify-center">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px]  lg:h-[350px] h-auto mt-16 ">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-[800px] lg:h-[350px] h-auto mt-16">
           <div className="flex-1 text-left">
             <h6 className="dashboard text-2xl lg:text-5xl">{dataAnak.nama}</h6>
             <h6 className="dashboard text-2xl lg:text-5xl">{`${moment().diff(
@@ -1251,7 +1255,7 @@ export default function Detail() {
             Tinggi Badan
           </button>
           <button
-            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg "
+            className="button_detail text-sm sm:text-base px-4 py-2 rounded-lg"
             onClick={() => handleButtonClick("Content 3")}
           >
             Lingkar Kepala
