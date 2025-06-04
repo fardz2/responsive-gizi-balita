@@ -50,7 +50,7 @@ export default function NavbarComp(props) {
   const BasicNavbar = () => (
     <Navbar style={navbarStyle} expand="md">
       <Container fluid="md">
-        <Navbar.Brand as={Link} to="/home">
+        <Navbar.Brand as={Link} to="/">
           <h2 className="text-base md:text-xl text-white">
             KMS Digital{" "}
             <span className="text-[#b14444] font-bold">Lebakwangi</span>
@@ -89,7 +89,7 @@ export default function NavbarComp(props) {
     return (
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
-          <Navbar.Brand as={Link} to="/home">
+          <Navbar.Brand as={Link} to="/">
             <h2 className="text-base md:text-xl text-white">
               KMS Digital{" "}
               <span className="text-[#b14444] font-bold">Lebakwangi</span>
@@ -224,7 +224,7 @@ export default function NavbarComp(props) {
     return (
       <Navbar style={navbarStyle} expand="lg">
         <Container fluid="md">
-          <Navbar.Brand as={Link} to="/home">
+          <Navbar.Brand as={Link} to="/">
             <h2 className="text-base md:text-xl text-white">
               KMS Digital{" "}
               <span className="text-[#b14444] font-bold">Lebakwangi</span>
