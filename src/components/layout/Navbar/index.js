@@ -73,7 +73,9 @@ export default function NavbarComp(props) {
             </Link>
             <Link
               to="/"
-              style={activeLink === "/" ? activeNavLinkStyle : navLinkStyle}
+              style={
+                activeLink === "/about" ? activeNavLinkStyle : navLinkStyle
+              }
             >
               <h5>About</h5>
             </Link>
