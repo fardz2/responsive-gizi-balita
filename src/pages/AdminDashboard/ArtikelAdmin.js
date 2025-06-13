@@ -397,21 +397,19 @@ export default function ArtikelAdmin() {
                 )}
                 <Col span={24} align="center">
                   <Form.Item>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      className="button_kirim mx-5"
-                    >
-                      {statePageKateogries ? "Tambah" : "Kirim"}
-                    </Button>
+                    <button type="submit" className="button_kirim mx-5 ">
+                      {statePageKateogries
+                        ? "Tambah kategori"
+                        : "Tambah artikel"}
+                    </button>
                     {statePageKateogries && (
-                      <Button
+                      <button
                         type="primary"
                         className="button_kirim mx-5"
                         onClick={() => setStatePageKateogries(false)}
                       >
                         Batal
-                      </Button>
+                      </button>
                     )}
                   </Form.Item>
                 </Col>

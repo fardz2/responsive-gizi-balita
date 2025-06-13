@@ -209,7 +209,7 @@ export default function RegisterTenagaKesehatan() {
               <Col span={24} align="center">
                 <Form.Item>
                   <Button type="primary" htmlType="submit">
-                    Kirim
+                    Tambah tenaga kesehatan
                   </Button>
                 </Form.Item>
               </Col>

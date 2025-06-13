@@ -205,7 +205,7 @@ export default function RegisterKaderPosyandu() {
               <Col span={24} align="center">
                 <Form.Item>
                   <Button type="primary" htmlType="submit">
-                    Kirim
+                    Tambah kader posyandu
                   </Button>
                 </Form.Item>
               </Col>

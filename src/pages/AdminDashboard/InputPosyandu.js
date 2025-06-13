@@ -1,7 +1,7 @@
 import { Button, Col, Form, Input, message, Row, Select, Table } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Container from 'react-bootstrap/Container';
+import Container from "react-bootstrap/Container";
 
 export default function InputPosyandu() {
   const [form] = Form.useForm();
@@ -30,8 +30,8 @@ export default function InputPosyandu() {
       key: "nama",
       filteredValue: [searchText],
       onFilter: (value, record) => {
-        return String(record.nama).toLowerCase().includes(value.toLowerCase())
-      }
+        return String(record.nama).toLowerCase().includes(value.toLowerCase());
+      },
     },
     {
       title: "Alamat",
@@ -65,7 +65,7 @@ export default function InputPosyandu() {
       .then((response) => {
         setDataDesa(response.data.data);
       })
-      .catch((err) => { });
+      .catch((err) => {});
     // eslint-disable-next-line
   }, [refreshKey]);
 
@@ -94,7 +94,14 @@ export default function InputPosyandu() {
 
   return (
     <>
-      <Container fluid style={{ backgroundColor: "white", padding: "20px", borderRadius: "20px" }}>
+      <Container
+        fluid
+        style={{
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "20px",
+        }}
+      >
         {contextHolder}
         <Row justify="space-between">
           <Col span={24}>
@@ -155,24 +162,23 @@ export default function InputPosyandu() {
                 {!isLoading && (
                   <Table
                     // title={() => <h1>Daftar Posyandu</h1>}
-                    title={
-                      () => (
-                        <div className="flex justify-between items-center">
-                          <div className="flex justify-start items-center">
-                            <h2 className="text-sm font-semibold">Daftar Posyandu</h2>
-                          </div>
-                          <div className="flex justify-end items-center">
-                            <Input.Search
-                              placeholder="Search here ..."
-                              onSearch={(value) => {
-                                setSearchedText(value)
-                              }}
-                            />
-                          </div>
+                    title={() => (
+                      <div className="flex justify-between items-center">
+                        <div className="flex justify-start items-center">
+                          <h2 className="text-sm font-semibold">
+                            Daftar Posyandu
+                          </h2>
                         </div>
-
-                      )
-                    }
+                        <div className="flex justify-end items-center">
+                          <Input.Search
+                            placeholder="Search here ..."
+                            onSearch={(value) => {
+                              setSearchedText(value);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     dataSource={dataSource}
                     columns={columns}
                     loading={isLoading}
@@ -183,12 +189,11 @@ export default function InputPosyandu() {
 
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Kirim
+                  Tambah posyandu
                 </Button>
               </Form.Item>
             </Form>
           </Col>
-
         </Row>
       </Container>
     </>
