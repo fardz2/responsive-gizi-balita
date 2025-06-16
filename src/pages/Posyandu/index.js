@@ -41,7 +41,7 @@ const PosyanduDashboard = () => {
   const navigate = useNavigate();
   const [isOpenModalUpdateDataAnak, setIsOpenModalUpdateDataAnak] =
     useState(false);
-  console.log(user);
+
   useEffect(() => {
     function fetchDataAnak() {
       if (user.user.role !== "ORANG_TUA") {
@@ -53,12 +53,12 @@ const PosyanduDashboard = () => {
             const sortedData = response.data.data.sort((a, b) =>
               b.created_at.localeCompare(a.created_at)
             );
+            console.log(response.data.data);
             setData(sortedData);
             setIsLoading(false);
           })
           .catch((err) => {
             setIsLoading(false);
-            console.log(err);
           });
       } else {
         axios
@@ -69,12 +69,12 @@ const PosyanduDashboard = () => {
             const sortedData = response.data.data.sort((a, b) =>
               b.created_at.localeCompare(a.created_at)
             );
+
             setData(sortedData);
             setIsLoading(false);
           })
           .catch((err) => {
             setIsLoading(false);
-            console.log(err);
           });
       }
     }
@@ -119,7 +119,7 @@ const PosyanduDashboard = () => {
         accessor: "aksi",
         Cell: ({ row }) => {
           const id = row.original.id;
-          console.log(id);
+
           const data = row.original;
           return (
             <>
@@ -176,7 +176,6 @@ const PosyanduDashboard = () => {
                           })
 
                           .catch((err) => {
-                            console.log(err);
                             messageApi.open({
                               type: "error",
                               content: "Data gagal dihapus",

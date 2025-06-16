@@ -49,6 +49,7 @@ export default function Dashboard() {
           const sortedData = response.data.data.sort((a, b) =>
             b.created_at.localeCompare(a.created_at)
           );
+          console.log(sortedData);
           setData(sortedData);
           setIsLoading(false);
         })

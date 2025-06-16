@@ -1,24 +1,13 @@
-import {
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  message,
-  Modal,
-  Row,
-  Select,
-} from "antd";
+import { Col, Form, Input, message, Modal, Row } from "antd";
 import axios from "axios";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 export default function FormInputDataExcel(props) {
   let login_data;
   if (typeof window !== "undefined") {
-    login_data = JSON.parse(`${localStorage.getItem("login_data")}`);
+    login_data = JSON.parse(localStorage.getItem("login_data") || "{}");
   }
-  // eslint-disable-next-line
-  const [user, setUser] = useState(login_data);
+  const [user] = useState(login_data);
   const { isOpen, onCancel, fetch } = props;
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -27,19 +16,27 @@ export default function FormInputDataExcel(props) {
   function onOK() {
     form
       .validateFields()
-      .then((values) => {
-        form.resetFields();
-        console.log(values);
-        console.log(excelFile);
+      .then(() => {
+        if (!excelFile) {
+          messageApi.open({
+            type: "error",
+            content: "Pilih file terlebih dahulu!",
+          });
+          return;
+        }
 
         if (user && user.user.role === "KADER_POSYANDU") {
+          const formData = new FormData();
+          formData.append("file", excelFile); // Append file to FormData
+
           axios
             .post(
-              `${process.env.REACT_APP_BASE_URL}/api/posyandu/data-anak-excel`, excelFile,
+              `${process.env.REACT_APP_BASE_URL}/api/posyandu/data-anak-excel`,
+              formData,
               {
-                headers: { 
-                    Authorization: `Bearer ${user.token.value}`,
-                    'Content-Type': 'multipart/form',
+                headers: {
+                  Authorization: `Bearer ${user.token.value}`,
+                  "Content-Type": "multipart/form-data",
                 },
               }
             )
@@ -48,25 +45,27 @@ export default function FormInputDataExcel(props) {
                 type: "success",
                 content: "Data berhasil diupload",
               });
+              form.resetFields();
+              setExcelFile(null);
               setTimeout(() => {
                 onCancel();
                 fetch();
               }, 2000);
             })
             .catch((err) => {
-              console.log(err);
+              console.error("Upload error:", err);
               messageApi.open({
                 type: "error",
-                content: "Data gagal diupload",
+                content: err.response?.data?.message || "Data gagal diupload",
               });
               setTimeout(() => {
                 onCancel();
-              }, 20000);
+              }, 3000); // Reduced timeout for better UX
             });
         }
       })
       .catch((info) => {
-        console.log("Validate Failed:", info);
+        console.log("Validation Failed:", info);
       });
   }
 
@@ -75,20 +74,28 @@ export default function FormInputDataExcel(props) {
       {contextHolder}
       <Modal
         open={isOpen}
-        onCancel={onCancel}
+        onCancel={() => {
+          form.resetFields();
+          setExcelFile(null);
+          onCancel();
+        }}
         title="Upload Data Excel"
         footer={[
           <button
             key="back"
             type="button"
-            onClick={onCancel}
+            onClick={() => {
+              form.resetFields();
+              setExcelFile(null);
+              onCancel();
+            }}
             className="batal_btn"
           >
             Batal
           </button>,
           <button
             key="submit"
-            type="submit"
+            type="button"
             onClick={onOK}
             className="simpan_btn"
           >
@@ -109,17 +116,13 @@ export default function FormInputDataExcel(props) {
                   },
                 ]}
               >
-                {/* <input
-                    type="file"
-                    onChange={(e) => {
-                        setExcelFile(e.target.files[0]);
-                    }}
-                /> */}
-                <Input type="file" accept=".xlsx, .csv, .xls" onChange={
-                    (e) => {
-                        setExcelFile(e.target.files[0]);
-                    }
-                }/>
+                <Input
+                  type="file"
+                  accept=".xlsx" // Restrict to .xlsx for ICoDSA 2025
+                  onChange={(e) => {
+                    setExcelFile(e.target.files[0]);
+                  }}
+                />
               </Form.Item>
             </Form>
           </Col>

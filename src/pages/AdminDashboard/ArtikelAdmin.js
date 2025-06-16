@@ -40,6 +40,33 @@ export default function ArtikelAdmin() {
   const [searchText, setSearchedText] = useState("");
   const [statePageKateogries, setStatePageKateogries] = useState(false);
 
+  // Validate image file
+  const validateImage = (file) => {
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/gif",
+      "image/svg+xml",
+    ];
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+
+    if (!file) {
+      return Promise.reject(new Error("Cover masih kosong!"));
+    }
+    if (!validTypes.includes(file.type)) {
+      return Promise.reject(
+        new Error(
+          "Format file tidak valid! Hanya JPEG, PNG, JPG, GIF, atau SVG yang diperbolehkan."
+        )
+      );
+    }
+    if (file.size > maxSize) {
+      return Promise.reject(new Error("Ukuran file maksimal 2MB!"));
+    }
+    return Promise.resolve();
+  };
+
   const onFinish = (values) => {
     if (!statePageKateogries) {
       if (imageFile) {
@@ -71,9 +98,14 @@ export default function ArtikelAdmin() {
             console.error(err);
             messageApi.open({
               type: "error",
-              content: "Data gagal tersimpan",
+              content: err.response?.data?.message || "Data gagal tersimpan",
             });
           });
+      } else {
+        messageApi.open({
+          type: "error",
+          content: "Silakan unggah cover artikel terlebih dahulu!",
+        });
       }
     } else {
       axios
@@ -94,7 +126,7 @@ export default function ArtikelAdmin() {
           console.error(err);
           messageApi.open({
             type: "error",
-            content: "Data gagal tersimpan",
+            content: err.response?.data?.message || "Data gagal tersimpan",
           });
         });
     }
@@ -159,18 +191,33 @@ export default function ArtikelAdmin() {
   ];
 
   useEffect(() => {
+    if (!user.token?.value) {
+      messageApi.open({
+        type: "error",
+        content: "Silakan login terlebih dahulu",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/api/artikel`, {
         headers: { Authorization: `Bearer ${user.token?.value}` },
       })
       .then((response) => {
         setDataSource(response.data.data);
-        setIsLoading(false);
         setStatePage("Artikel");
         setStatePageKateogries(false);
       })
       .catch((err) => {
         console.error(err);
+        messageApi.open({
+          type: "error",
+          content: "Gagal mengambil data artikel",
+        });
+      })
+      .finally(() => {
         setIsLoading(false);
       });
 
@@ -180,13 +227,15 @@ export default function ArtikelAdmin() {
       })
       .then((response) => {
         setDataKategori(response.data.data);
-        setIsLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setIsLoading(false);
+        messageApi.open({
+          type: "error",
+          content: "Gagal mengambil data kategori",
+        });
       });
-  }, [refreshKey, user.token?.value]);
+  }, [refreshKey, user.token?.value, messageApi]);
 
   function deleteDesa(id) {
     axios
@@ -325,7 +374,9 @@ export default function ArtikelAdmin() {
                       label="Unggah cover artikel"
                       name="image"
                       rules={[
-                        { required: true, message: "Cover masih kosong!" },
+                        {
+                          validator: (_, value) => validateImage(imageFile),
+                        },
                       ]}
                     >
                       <div className="flex justify-center items-center w-full">
@@ -368,16 +419,36 @@ export default function ArtikelAdmin() {
                                 className="text-xs"
                                 style={{ color: "#b41318" }}
                               >
-                                Unggah Cover Digital
+                                JPEG, PNG, JPG, GIF, SVG (Maks. 2MB)
                               </p>
                             </div>
                           )}
                           <input
                             id="import_pelanggan"
                             type="file"
-                            accept=".jpg, .jpeg, .png"
-                            style={{ color: "#b41318" }}
-                            onChange={(e) => setImageFile(e.target.files[0])}
+                            accept=".jpg,.jpeg,.png,.gif,.svg"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                validateImage(file)
+                                  .then(() => {
+                                    setImageFile(file);
+                                    form.validateFields(["image"]);
+                                  })
+                                  .catch((error) => {
+                                    messageApi.open({
+                                      type: "error",
+                                      content: error.message,
+                                    });
+                                    setImageFile(null);
+                                    form.validateFields(["image"]);
+                                  });
+                              } else {
+                                setImageFile(null);
+                                form.validateFields(["image"]);
+                              }
+                            }}
                           />
                         </label>
                       </div>
@@ -386,6 +457,16 @@ export default function ArtikelAdmin() {
                       style={{ width: "100%", flexDirection: "row" }}
                       label="Paragraf"
                       name="content"
+                      rules={[
+                        {
+                          validator: (_, value) =>
+                            valueContent
+                              ? Promise.resolve()
+                              : Promise.reject(
+                                  new Error("Konten masih kosong!")
+                                ),
+                        },
+                      ]}
                     >
                       <ReactQuill
                         theme="snow"
@@ -397,7 +478,7 @@ export default function ArtikelAdmin() {
                 )}
                 <Col span={24} align="center">
                   <Form.Item>
-                    <button type="submit" className="button_kirim mx-5 ">
+                    <button type="submit" className="button_kirim mx-5">
                       {statePageKateogries
                         ? "Tambah kategori"
                         : "Tambah artikel"}
