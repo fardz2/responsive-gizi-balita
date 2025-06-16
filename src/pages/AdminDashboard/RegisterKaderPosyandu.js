@@ -347,6 +347,7 @@ export default function RegisterKaderPosyandu() {
                 locale={{
                   emptyText: "Tidak ada data Kader Posyandu",
                 }}
+                scroll={{ x: "max-content" }} // Enable horizontal scrolling
               />
             )}
           </Col>

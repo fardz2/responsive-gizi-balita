@@ -350,6 +350,7 @@ export default function RegisterTenagaKesehatan() {
                 locale={{
                   emptyText: "Tidak ada data Tenaga Kesehatan",
                 }}
+                scroll={{ x: "max-content" }} // Enable horizontal scrolling
               />
             )}
           </Col>
