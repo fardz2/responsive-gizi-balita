@@ -132,8 +132,6 @@ const PosyanduDashboard = () => {
                 >
                   Detail
                 </button>
-                {/* </Link> */}
-
                 <button
                   type="button"
                   class="buttonUpdate"
@@ -174,7 +172,6 @@ const PosyanduDashboard = () => {
                               fetch();
                             }, 1000);
                           })
-
                           .catch((err) => {
                             messageApi.open({
                               type: "error",
@@ -185,29 +182,12 @@ const PosyanduDashboard = () => {
                             }, 1000);
                           });
                       },
-                      // onCancel: () => {
-                      //    messageApi.open({
-                      //         type: "error",
-                      //         content: "Data gagal dihapus",
-                      //     });
-                      // },
                     });
                   }}
                 >
                   Delete
                 </button>
               </div>
-              {/* <div className="flex">
-              <CustomButton className="bg-orange-500">
-                Detail
-              </CustomButton>
-              <CustomButton className="bg-green-300">
-                Update
-              </CustomButton>
-              <CustomButton className="bg-red-300">
-                Delete
-              </CustomButton>
-            </div> */}
             </>
           );
         },
@@ -227,19 +207,16 @@ const PosyanduDashboard = () => {
           className="justify-content-center align-items-center flex"
           style={{ marginTop: "94px" }}
         >
-          <Col>
+          <Col className="text-center">
             <h6 className="dashboard text-2xl lg:text-5xl">
-              Hallo {user && user.user.name}
+              Halo {user?.user?.name || ""}
             </h6>
+            <h3 className="dashboard text-xl lg:text-3xl">
+              Selamat datang di posyandu {user?.user?.posyandu_name || ""},{" "}
+            </h3>
           </Col>
         </Row>
         <Row className="justify-content-center" style={{ marginTop: "30px" }}>
-          {/* <Link to={`/dashboard/detail/${record.id}`}>
-            <button type="button" class="button3 mx-5">
-              Cek Data Anak
-            </button>
-          </Link> */}
-
           <ReactToPrint
             trigger={() => {
               return (

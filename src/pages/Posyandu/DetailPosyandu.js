@@ -702,6 +702,7 @@ export default function DetailPosyandu() {
               type: "error",
               content: "Gagal mengambil data perkembangan anak",
             });
+            console.log(err);
             setIsLoading(false);
           });
       } else {
@@ -725,6 +726,7 @@ export default function DetailPosyandu() {
               type: "error",
               content: "Gagal mengambil data perkembangan anak",
             });
+            console.log(err);
             setIsLoading(false);
           });
       }

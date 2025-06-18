@@ -151,10 +151,7 @@ export default function NavbarComp(props) {
     <Navbar style={navbarStyle} expand="md">
       <Container fluid="md">
         <Navbar.Brand as={Link} to="/">
-          <h2 className="text-base md:text-xl text-white">
-            KMS Digital{" "}
-            <span className="text-[#b14444] font-bold">Lebakwangi</span>
-          </h2>
+          <h2 className="text-base md:text-xl text-white">KMS Digital</h2>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse
@@ -194,7 +191,9 @@ export default function NavbarComp(props) {
             <Navbar.Brand as={Link} to="/">
               <h2 className="text-base md:text-xl text-white">
                 KMS Digital{" "}
-                <span className="text-[#b14444] font-bold">Lebakwangi</span>
+                <span className="text-[#b14444] font-bold">
+                  {user?.user?.desa_name || ""}
+                </span>
               </h2>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -402,7 +401,9 @@ export default function NavbarComp(props) {
           <Navbar.Brand as={Link} to="/">
             <h2 className="text-base md:text-xl text-white">
               KMS Digital{" "}
-              <span className="text-[#b14444] font-bold">Lebakwangi</span>
+              <span className="text-[#b14444] font-bold">
+                {user?.user?.desa_name || ""}
+              </span>
             </h2>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />

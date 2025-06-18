@@ -1,4 +1,14 @@
-import { Button, Col, Form, Input, message, Row, Select, Table } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Row,
+  Select,
+  Table,
+  Modal,
+} from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
@@ -13,6 +23,7 @@ export default function RegisterTenagaKesehatan() {
   const [refreshKey, setRefreshKey] = useState(0); // Refresh key for refetching
   const [searchText, setSearchedText] = useState(""); // Search text for filtering
   const [messageApi, contextHolder] = message.useMessage();
+  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
   const [user] = useState(() => {
     if (typeof window !== "undefined") {
       return JSON.parse(localStorage.getItem("login_data")) || {};
@@ -139,6 +150,7 @@ export default function RegisterTenagaKesehatan() {
           password: values.password,
           id_desa: values.desa,
           id_posyandu: values.posyandu,
+          status: true, // Set status to true automatically
         }
       )
       .then((response) => {
@@ -147,6 +159,7 @@ export default function RegisterTenagaKesehatan() {
           content: "Register Berhasil",
         });
         form.resetFields();
+        setIsModalVisible(false); // Close modal on success
         setRefreshKey((oldKey) => oldKey + 1); // Trigger refetch
       })
       .catch((error) => {
@@ -159,6 +172,15 @@ export default function RegisterTenagaKesehatan() {
 
   const onFinishFailed = (values) => {
     console.log(values);
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
   };
 
   return (
@@ -174,155 +196,160 @@ export default function RegisterTenagaKesehatan() {
         {contextHolder}
         <Row justify="space-between">
           <Col sm={24}>
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-              layout="horizontal"
+            <Button
+              type="primary"
+              onClick={showModal}
+              style={{ marginBottom: 16 }}
             >
-              <div className="flex justify-start items-center mb-4">
-                <h2 className="text-sm font-semibold">
-                  Registrasi Tenaga Kesehatan
-                </h2>
-              </div>
-              <Form.Item
-                label="Nama"
-                name="nama"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nama masih kosong!",
-                    type: "string",
-                  },
-                ]}
+              Tambah Tenaga Kesehatan
+            </Button>
+            <Modal
+              title="Registrasi Tenaga Kesehatan"
+              open={isModalVisible}
+              onCancel={handleCancel}
+              footer={null}
+            >
+              <Form
+                form={form}
+                name="basic"
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
+                layout="vertical"
               >
-                <Input placeholder="Nama Lengkap" />
-              </Form.Item>
-
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Email masih kosong!",
-                  },
-                  {
-                    type: "email",
-                    message: "Email belum sesuai!",
-                  },
-                ]}
-              >
-                <Input placeholder="user@email.com" />
-              </Form.Item>
-
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Password masih kosong!",
-                  },
-                  {
-                    pattern: "^.{8,}$",
-                    message: "Password minimal 8 karakter",
-                  },
-                ]}
-              >
-                <Input.Password placeholder="password" />
-              </Form.Item>
-
-              <Form.Item
-                label="Confirm Password"
-                name="confirm"
-                dependencies={["password"]}
-                rules={[
-                  {
-                    required: true,
-                    message: "Silahkan Confirm Password Anda!",
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue("password") === value) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error("Password tidak sesuai!")
-                      );
+                <Form.Item
+                  label="Nama"
+                  name="nama"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Nama masih kosong!",
+                      type: "string",
                     },
-                  }),
-                ]}
-              >
-                <Input.Password placeholder="Confirm Password" />
-              </Form.Item>
-
-              <Form.Item
-                name="desa"
-                label="Desa"
-                rules={[
-                  {
-                    required: true,
-                    message: "Desa masih kosong!",
-                  },
-                ]}
-              >
-                <Select
-                  listHeight={100}
-                  optionFilterProp="children"
-                  showSearch
-                  placeholder="Pilih Desa"
+                  ]}
                 >
-                  {dataDesa &&
-                    dataDesa.map((value) => (
-                      <Select.Option key={value.id} value={value.id}>
-                        {value.name}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
+                  <Input placeholder="Nama Lengkap" />
+                </Form.Item>
 
-              <Form.Item
-                name="posyandu"
-                label="Posyandu"
-                rules={[
-                  {
-                    required: true,
-                    message: "Posyandu masih kosong!",
-                  },
-                ]}
-              >
-                <Select
-                  listHeight={100}
-                  optionFilterProp="children"
-                  showSearch
-                  placeholder="Pilih Posyandu"
+                <Form.Item
+                  label="Email"
+                  name="email"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Email masih kosong!",
+                    },
+                    {
+                      type: "email",
+                      message: "Email belum sesuai!",
+                    },
+                  ]}
                 >
-                  {dataSource &&
-                    dataSource.map((value) => (
-                      <Select.Option key={value.id} value={value.id}>
-                        {value.nama}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
+                  <Input placeholder="user@email.com" />
+                </Form.Item>
 
-              <Col span={24} align="center">
+                <Form.Item
+                  label="Password"
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Password masih kosong!",
+                    },
+                    {
+                      pattern: "^.{8,}$",
+                      message: "Password minimal 8 karakter",
+                    },
+                  ]}
+                >
+                  <Input.Password placeholder="password" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Confirm Password"
+                  name="confirm"
+                  dependencies={["password"]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Silahkan Confirm Password Anda!",
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error("Password tidak sesuai!")
+                        );
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password placeholder="Confirm Password" />
+                </Form.Item>
+
+                <Form.Item
+                  name="desa"
+                  label="Desa"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Desa masih kosong!",
+                    },
+                  ]}
+                >
+                  <Select
+                    listHeight={100}
+                    optionFilterProp="children"
+                    showSearch
+                    placeholder="Pilih Desa"
+                  >
+                    {dataDesa &&
+                      dataDesa.map((value) => (
+                        <Select.Option key={value.id} value={value.id}>
+                          {value.name}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+
+                <Form.Item
+                  name="posyandu"
+                  label="Posyandu"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Posyandu masih kosong!",
+                    },
+                  ]}
+                >
+                  <Select
+                    listHeight={100}
+                    optionFilterProp="children"
+                    showSearch
+                    placeholder="Pilih Posyandu"
+                  >
+                    {dataSource &&
+                      dataSource.map((value) => (
+                        <Select.Option key={value.id} value={value.id}>
+                          {value.nama}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+
                 <Form.Item>
                   <Button type="primary" htmlType="submit">
-                    Tambah tenaga kesehatan
+                    Simpan
+                  </Button>
+                  <Button style={{ marginLeft: 8 }} onClick={handleCancel}>
+                    Batal
                   </Button>
                 </Form.Item>
-              </Col>
-            </Form>
-          </Col>
-        </Row>
+              </Form>
+            </Modal>
 
-        {/* Table for displaying Tenaga Kesehatan */}
-        <Row justify="space-between" style={{ marginTop: "20px" }}>
-          <Col sm={24}>
             {!isLoading && (
               <Table
                 title={() => (
