@@ -1,4 +1,14 @@
-import { Button, Col, Form, Input, message, Row, Select, Table } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Row,
+  Select,
+  Table,
+  Modal,
+} from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
@@ -11,17 +21,41 @@ export default function InputPosyandu() {
   const [messageApi, contextHolder] = message.useMessage();
   const [dataDesa, setDataDesa] = useState([]);
   const [searchText, setSearchedText] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   function deletePosyandu(id) {
     axios
       .delete(`${process.env.REACT_APP_BASE_URL}/api/posyandu/${id}`)
       .then((response) => {
         setRefreshKey((oldKey) => oldKey + 1);
+        messageApi.open({
+          type: "success",
+          content: "Posyandu berhasil dihapus",
+        });
       })
       .catch((err) => {
-        console.log(err);
+        messageApi.open({
+          type: "error",
+          content: err.response?.data?.message || "Gagal menghapus posyandu",
+        });
       });
   }
+
+  const showDeleteConfirm = (id, nama) => {
+    Modal.confirm({
+      title: "Konfirmasi Hapus",
+      content: `Apakah Anda yakin ingin menghapus posyandu "${nama}"?`,
+      okText: "Hapus",
+      okType: "danger",
+      cancelText: "Batal",
+      onOk() {
+        deletePosyandu(id);
+      },
+      onCancel() {
+        console.log("Hapus dibatalkan");
+      },
+    });
+  };
 
   const columns = [
     {
@@ -42,7 +76,11 @@ export default function InputPosyandu() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button onClick={() => deletePosyandu(record.id)} type="dashed" danger>
+        <Button
+          onClick={() => showDeleteConfirm(record.id, record.nama)}
+          type="dashed"
+          danger
+        >
           Delete
         </Button>
       ),
@@ -57,6 +95,10 @@ export default function InputPosyandu() {
         setIsLoading(false);
       })
       .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Gagal mengambil data posyandu",
+        });
         setIsLoading(false);
       });
 
@@ -65,9 +107,13 @@ export default function InputPosyandu() {
       .then((response) => {
         setDataDesa(response.data.data);
       })
-      .catch((err) => {});
-    // eslint-disable-next-line
-  }, [refreshKey]);
+      .catch((err) => {
+        messageApi.open({
+          type: "error",
+          content: "Gagal mengambil data desa",
+        });
+      });
+  }, [refreshKey, messageApi]);
 
   const onFinish = (values) => {
     axios
@@ -77,19 +123,33 @@ export default function InputPosyandu() {
         alamat: values.alamat,
       })
       .then((response) => {
+        messageApi.open({
+          type: "success",
+          content: "Posyandu berhasil disimpan",
+        });
         setRefreshKey((oldKey) => oldKey + 1);
         form.resetFields();
+        setIsModalVisible(false);
       })
       .catch((err) => {
         messageApi.open({
           type: "error",
-          content: "Data gagal tersimpan",
+          content: err.response?.data?.message || "Data gagal tersimpan",
         });
       });
   };
 
-  const onFinishFailed = (values) => {
-    console.log(values);
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.resetFields();
   };
 
   return (
@@ -105,94 +165,110 @@ export default function InputPosyandu() {
         {contextHolder}
         <Row justify="space-between">
           <Col span={24}>
-            <Form
-              form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-              layout="horizontal"
+            <Button
+              type="primary"
+              onClick={showModal}
+              style={{ marginBottom: 16 }}
             >
-              <Form.Item
-                label="Pilih Desa"
-                name="desa"
-                rules={[
-                  {
-                    required: true,
-                    message: "Desa masih kosong!",
-                  },
-                ]}
+              Tambah Posyandu
+            </Button>
+            <Modal
+              title="Tambah Posyandu"
+              open={isModalVisible}
+              onCancel={handleCancel}
+              footer={null}
+            >
+              <Form
+                form={form}
+                name="basic"
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
+                layout="vertical"
               >
-                <Select listHeight={100} optionFilterProp="children" showSearch>
-                  {dataDesa.map((item) => (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                <Form.Item
+                  label="Pilih Desa"
+                  name="desa"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Desa masih kosong!",
+                    },
+                  ]}
+                >
+                  <Select
+                    listHeight={100}
+                    optionFilterProp="children"
+                    showSearch
+                  >
+                    {dataDesa.map((item) => (
+                      <Select.Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
 
-              <Form.Item
-                label="Nama Posyandu"
-                name="posyandu"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nama Posyandu masih kosong!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
+                <Form.Item
+                  label="Nama Posyandu"
+                  name="posyandu"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Nama Posyandu masih kosong!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
 
-              <Form.Item
-                label="Alamat"
-                name="alamat"
-                rules={[
-                  {
-                    required: true,
-                    message: "Alamat masih kosong!",
-                  },
-                ]}
-              >
-                <Input.TextArea rows={3} />
-              </Form.Item>
+                <Form.Item
+                  label="Alamat"
+                  name="alamat"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Alamat masih kosong!",
+                    },
+                  ]}
+                >
+                  <Input.TextArea rows={3} />
+                </Form.Item>
 
-              <Col span={24}>
-                {!isLoading && (
-                  <Table
-                    // title={() => <h1>Daftar Posyandu</h1>}
-                    title={() => (
-                      <div className="flex justify-between items-center">
-                        <div className="flex justify-start items-center">
-                          <h2 className="text-sm font-semibold">
-                            Daftar Posyandu
-                          </h2>
-                        </div>
-                        <div className="flex justify-end items-center">
-                          <Input.Search
-                            placeholder="Search here ..."
-                            onSearch={(value) => {
-                              setSearchedText(value);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    dataSource={dataSource}
-                    columns={columns}
-                    loading={isLoading}
-                    pagination={{ pageSize: 5 }}
-                  />
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Simpan
+                  </Button>
+                  <Button style={{ marginLeft: 8 }} onClick={handleCancel}>
+                    Batal
+                  </Button>
+                </Form.Item>
+              </Form>
+            </Modal>
+            {!isLoading && (
+              <Table
+                title={() => (
+                  <div className="flex justify-between items-center">
+                    <div className="flex justify-start items-center">
+                      <h2 className="text-sm font-semibold">Daftar Posyandu</h2>
+                    </div>
+                    <div className="flex justify-end items-center">
+                      <Input.Search
+                        placeholder="Search here ..."
+                        onSearch={(value) => {
+                          setSearchedText(value);
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
-              </Col>
-
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Tambah posyandu
-                </Button>
-              </Form.Item>
-            </Form>
+                dataSource={dataSource}
+                columns={columns}
+                loading={isLoading}
+                pagination={{ pageSize: 5 }}
+                rowKey="id"
+              />
+            )}
           </Col>
         </Row>
       </Container>

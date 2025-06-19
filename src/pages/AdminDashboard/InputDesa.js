@@ -32,6 +32,22 @@ export default function InputDesa() {
       });
   }
 
+  const showDeleteConfirm = (id, name) => {
+    Modal.confirm({
+      title: "Konfirmasi Hapus",
+      content: `Apakah Anda yakin ingin menghapus desa "${name}"?`,
+      okText: "Hapus",
+      okType: "danger",
+      cancelText: "Batal",
+      onOk() {
+        deleteDesa(id);
+      },
+      onCancel() {
+        console.log("Hapus dibatalkan");
+      },
+    });
+  };
+
   const columns = [
     {
       title: "Nama Desa",
@@ -48,7 +64,7 @@ export default function InputDesa() {
       render: (_, record) => (
         <Button
           className="button_delete"
-          onClick={() => deleteDesa(record.id)}
+          onClick={() => showDeleteConfirm(record.id, record.name)}
           type="dashed"
           danger
         >

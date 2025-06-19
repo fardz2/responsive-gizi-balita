@@ -115,6 +115,10 @@ const PosyanduDashboard = () => {
         accessor: "alamat",
       },
       {
+        Header: "Nama Orang Tua",
+        accessor: "nama_ortu",
+      },
+      {
         Header: "",
         accessor: "aksi",
         Cell: ({ row }) => {

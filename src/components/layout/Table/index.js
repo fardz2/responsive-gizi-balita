@@ -5,21 +5,21 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { SortIcon, SortUpIcon, SortDownIcon } from "./Icons"; // Pastikan ikon tersedia
-import { Button, PageButton } from "./Button"; // Pastikan Button dan PageButton tersedia
+import { SortIcon, SortUpIcon, SortDownIcon } from "./Icons";
+import { Button, PageButton } from "./Button";
 import { useMemo, useState, useEffect } from "react";
-import GlobalFilter from "./GlobalFilter"; // Pastikan GlobalFilter tersedia
-import exportTemplate from "../../../pages/Posyandu/ExportTemplate"; // Pastikan ini ada
-import { Col } from "antd";
-import FormInputDataExcel from "../../form/FormInputDataExcel"; // Pastikan ini ada
-import FormInputDataAnak from "../../form/FormInputDataAnak"; // Pastikan ini ada
+import GlobalFilter from "./GlobalFilter";
+import exportTemplate from "../../../pages/Posyandu/ExportTemplate";
+import { Col, Modal, message, Form, Input } from "antd";
+import FormInputDataExcel from "../../form/FormInputDataExcel";
+import FormInputDataAnak from "../../form/FormInputDataAnak";
 import ReactSelect from "react-select";
+import axios from "axios";
 
-// Komponen SelectColumnFilter
+// Komponen SelectColumnFilter (tidak berubah)
 export function SelectColumnFilter({ column }) {
   const { filterOpt, filterValue, setFilter, preFilteredRows, id, render } =
     column;
-
   const options = useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
@@ -45,12 +45,18 @@ export function SelectColumnFilter({ column }) {
         name={id}
         id={id}
         onChange={(e) => {
-          setFilter(e.value || undefined);
+          console.log("Applying filter for", id, ":", e.value);
+          setFilter(e.value === "" ? undefined : Number(e.value));
         }}
         placeholder="All"
-        defaultValue={{
-          value: filterValue ? filterValue : "",
-          label: filterValue ? filterValue : "All",
+        value={{
+          value: filterValue !== undefined ? filterValue : "",
+          label:
+            filterValue !== undefined
+              ? filterValue == 1
+                ? "Approve"
+                : "Belum Diapprove"
+              : "All",
         }}
         options={[{ value: "", label: "All" }, ...opt]}
       />
@@ -58,11 +64,115 @@ export function SelectColumnFilter({ column }) {
   );
 }
 
+// Komponen FormTambahOrangTua
+function FormTambahOrangTua({ isOpen, onCancel, fetchOrangTua, user }) {
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
+
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      const payload = {
+        email: values.email,
+        password: values.password,
+        nama: values.nama,
+        alamat: values.alamat,
+        status: 1, // Set status to approved
+        id_posyandu: user.user?.id_posyandu, // Default dari user kader yang login
+        id_desa: user.user?.id_desa, // Default dari user kader yang login
+      };
+      console.log(user);
+
+      await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/auth/orang-tua/register`,
+        payload
+      );
+
+      messageApi.open({
+        type: "success",
+        content: "Berhasil menambahkan orang tua",
+      });
+      fetchOrangTua(); // Refresh parent list
+      form.resetFields();
+      onCancel();
+    } catch (error) {
+      console.error("Error adding parent:", error);
+      messageApi.open({
+        type: "error",
+        content: error.response?.data?.message || "Gagal menambahkan orang tua",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {contextHolder}
+      <Modal
+        title="Tambah Orang Tua"
+        open={isOpen}
+        onCancel={onCancel}
+        footer={null}
+        width={600}
+        confirmLoading={loading}
+        zIndex={1001} // Pastikan modal ini di atas modal lain
+      >
+        <Form
+          form={form}
+          name="tambah_orang_tua"
+          onFinish={onFinish}
+          layout="vertical"
+          autoComplete="off"
+        >
+          <Form.Item
+            label="Nama"
+            name="nama"
+            rules={[{ required: true, message: "Nama masih kosong!" }]}
+          >
+            <Input placeholder="Masukkan nama" />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              { required: true, message: "Email masih kosong!" },
+              { type: "email", message: "Email belum sesuai!" },
+            ]}
+          >
+            <Input placeholder="user@email.com" />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Password masih kosong!" }]}
+          >
+            <Input.Password placeholder="Masukkan password" />
+          </Form.Item>
+          <Form.Item
+            label="Alamat"
+            name="alamat"
+            rules={[{ required: true, message: "Alamat masih kosong!" }]}
+          >
+            <Input placeholder="Masukkan alamat" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Simpan
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+}
+
 // Komponen Table
 function Table({
   columns,
   data,
-  initialState = { pageIndex: 0, pageSize: 5 }, // Default pageSize kecil untuk memastikan pagination
+  initialState = { pageIndex: 0, pageSize: 5 },
   TableHooks = false,
   noSearch = false,
   ButtonCus = false,
@@ -84,6 +194,7 @@ function Table({
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
+    setAllFilters,
   } = useTable(
     {
       columns,
@@ -102,7 +213,21 @@ function Table({
   const [isOpenModalInputExcel, setIsOpenModalInputExcel] = useState(false);
   const [isOpenModalInputDataAnak, setIsOpenModalInputDataAnak] =
     useState(false);
+  const [isOpenModalOrangTua, setIsOpenModalOrangTua] = useState(false);
+  const [isOpenModalTambahOrangTua, setIsOpenModalTambahOrangTua] =
+    useState(false);
+  const [orangTuaData, setOrangTuaData] = useState([]);
+  const [orangTuaLoading, setOrangTuaLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [approvingIds, setApprovingIds] = useState(new Set());
+
+  // Initialize user from localStorage
+  let login_data;
+  if (typeof window !== "undefined") {
+    login_data = JSON.parse(localStorage.getItem("login_data")) || {};
+  }
+  const [user, setUser] = useState(login_data);
 
   const dataTemplate = [
     {
@@ -117,7 +242,6 @@ function Table({
       tinggi: 91,
       lila: 25,
     },
-    // Tambahkan data dummy untuk memastikan pagination
     ...Array.from({ length: 10 }, (_, i) => ({
       nama: `Nama ${i + 2}`,
       panggilan: `Panggilan ${i + 2}`,
@@ -131,6 +255,164 @@ function Table({
       lila: 20 + i,
     })),
   ];
+
+  // Fetch parent data
+  const fetchOrangTua = async () => {
+    if (!user.token?.value) {
+      messageApi.open({
+        type: "error",
+        content: "Silakan login terlebih dahulu",
+      });
+      setOrangTuaLoading(false);
+      setIsOpenModalOrangTua(false);
+      return;
+    }
+
+    setOrangTuaLoading(true);
+    try {
+      const response = await axios.get(
+        `${
+          process.env.REACT_APP_BASE_URL
+        }/api/posyandu/orang-tua/list?_=${Date.now()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token?.value}`,
+          },
+        }
+      );
+      const normalizedData = response.data.data.map((item) => ({
+        ...item,
+        status: Number(item.status),
+      }));
+      setOrangTuaData(normalizedData);
+    } catch (err) {
+      messageApi.open({
+        type: "error",
+        content:
+          err.response?.data?.message || "Gagal mengambil data orang tua",
+      });
+      setOrangTuaData([]);
+    } finally {
+      setOrangTuaLoading(false);
+    }
+  };
+
+  // Fetch parent data and reset filters when modal opens or after approval
+  useEffect(() => {
+    if (isOpenModalOrangTua) {
+      fetchOrangTua();
+      setAllFilters([]);
+    }
+  }, [isOpenModalOrangTua, refreshKey, user.token?.value, setAllFilters]);
+
+  // Handle approval
+  const handleApproveOrangTua = (id, nama) => {
+    if (!user.token?.value) {
+      messageApi.open({
+        type: "error",
+        content: "Silakan login terlebih dahulu",
+      });
+      return;
+    }
+
+    Modal.confirm({
+      title: "Konfirmasi Status Orang Tua",
+      content: `Apakah Anda yakin ingin menyetujui ${nama}? Setelah disetujui, orang tua dapat mengakses data anak di posyandu.`,
+      okText: "Setujui",
+      okType: "primary",
+      cancelText: "Batal",
+      onOk: async () => {
+        setApprovingIds((prev) => new Set(prev).add(id));
+        const originalData = [...orangTuaData];
+        setOrangTuaData((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: 1 } : item))
+        );
+
+        try {
+          await axios.post(
+            `${process.env.REACT_APP_BASE_URL}/api/posyandu/orang-tua/${id}/approve`,
+            { status: 1 },
+            {
+              headers: {
+                Authorization: `Bearer ${user.token?.value}`,
+              },
+            }
+          );
+          messageApi.open({
+            type: "success",
+            content: "Status orang tua berhasil diperbarui",
+          });
+          await fetchOrangTua();
+        } catch (err) {
+          setOrangTuaData(originalData);
+          messageApi.open({
+            type: "error",
+            content:
+              err.response?.data?.message ||
+              "Gagal memperbarui status orang tua",
+          });
+        } finally {
+          setApprovingIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+          });
+        }
+      },
+    });
+  };
+
+  // Columns for parent table
+  const orangTuaColumns = useMemo(
+    () => [
+      {
+        Header: "No",
+        accessor: "no",
+        disableFilters: true,
+      },
+      {
+        Header: "Nama",
+        accessor: "nama",
+      },
+      {
+        Header: "Alamat",
+        accessor: "alamat",
+      },
+      {
+        Header: "Status",
+        accessor: "status",
+        Cell: ({ value }) => (value == 1 ? "Approve" : "Belum Diapprove"),
+        Filter: SelectColumnFilter,
+        filter: "equals",
+        filterOpt: [
+          { value: "", label: "All" },
+          { value: 1, label: "Approve" },
+          { value: 0, label: "Belum Diapprove" },
+        ],
+      },
+      {
+        Header: "Aksi",
+        accessor: "action",
+        disableFilters: true,
+        Cell: ({ row }) =>
+          row.original.status === 1 ? (
+            <span className="text-gray-500">Approved</span>
+          ) : (
+            <Button
+              type="primary"
+              loading={approvingIds.has(row.original.id)}
+              disabled={approvingIds.has(row.original.id)}
+              onClick={() =>
+                handleApproveOrangTua(row.original.id, row.original.nama)
+              }
+            >
+              Setujui
+            </Button>
+          ),
+      },
+    ],
+    [approvingIds]
+  );
 
   // Debug log untuk memantau status pagination
   useEffect(() => {
@@ -155,6 +437,7 @@ function Table({
 
   return (
     <>
+      {contextHolder}
       <div className="sm:flex flex-col sm:gap-x-10">
         {!noSearch && (
           <div className="flex items-center justify-between max-w-full">
@@ -193,9 +476,9 @@ function Table({
           </button>
           <button
             className="button2"
-            onClick={() => setIsOpenModalInputExcel(true)}
+            onClick={() => setIsOpenModalOrangTua(true)}
           >
-            Masukkan Data Excel
+            Lihat Orang Tua
           </button>
         </div>
       )}
@@ -349,7 +632,6 @@ function Table({
               disabled={!canPreviousPage}
             >
               <span className="sr-only">First</span>
-              {/* Ganti dengan ikon ChevronDoubleLeftIcon jika tersedia */}
               <span>«</span>
             </PageButton>
             <PageButton
@@ -357,7 +639,6 @@ function Table({
               disabled={!canPreviousPage}
             >
               <span className="sr-only">Previous</span>
-              {/* Ganti dengan ChevronLeftIcon jika tersedia */}
               <span>‹</span>
             </PageButton>
             {Array.from({ length: pageCount }, (_, index) => (
@@ -375,7 +656,6 @@ function Table({
             ))}
             <PageButton onClick={() => nextPage()} disabled={!canNextPage}>
               <span className="sr-only">Next</span>
-              {/* Ganti dengan ChevronRightIcon jika tersedia */}
               <span>›</span>
             </PageButton>
             <PageButton
@@ -384,7 +664,6 @@ function Table({
               disabled={!canNextPage}
             >
               <span className="sr-only">Last</span>
-              {/* Ganti dengan ChevronDoubleRightIcon jika tersedia */}
               <span>»</span>
             </PageButton>
           </nav>
@@ -404,6 +683,49 @@ function Table({
           fetch={() => setRefreshKey((oldKey) => oldKey + 1)}
         />
       </Col>
+      <Modal
+        title="Daftar Orang Tua"
+        open={isOpenModalOrangTua}
+        onCancel={() => {
+          setIsOpenModalOrangTua(false);
+          setAllFilters([]);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsOpenModalOrangTua(false);
+              setAllFilters([]);
+            }}
+          >
+            Tutup
+          </Button>,
+        ]}
+        width={800}
+        confirmLoading={orangTuaLoading}
+      >
+        <div className="mb-4">
+          <Button
+            type="primary"
+            onClick={() => setIsOpenModalTambahOrangTua(true)}
+          >
+            Tambah Orang Tua
+          </Button>
+        </div>
+        <Table
+          columns={orangTuaColumns}
+          data={orangTuaData}
+          initialState={{ pageIndex: 0, pageSize: 5 }}
+          noSearch={true}
+          ButtonCus={false}
+        />
+      </Modal>
+      <FormTambahOrangTua
+        isOpen={isOpenModalTambahOrangTua}
+        onCancel={() => setIsOpenModalTambahOrangTua(false)}
+        fetchOrangTua={fetchOrangTua}
+        user={user}
+      />
     </>
   );
 }

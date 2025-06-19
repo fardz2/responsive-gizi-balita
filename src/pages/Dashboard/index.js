@@ -142,7 +142,7 @@ export default function Dashboard() {
               {user && user.user.name}
             </h6>
             <h5 className="text-[#B14444] text-lg sm:text-xl mb-4">
-              Selamat Datang Kembali
+              Selamat datang di posyandu {user?.user?.posyandu_name || ""}
             </h5>
             <button
               className="cssbuttons-io-button"

@@ -539,7 +539,7 @@ export default function DetailPosyandu() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -593,7 +593,7 @@ export default function DetailPosyandu() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -647,7 +647,7 @@ export default function DetailPosyandu() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -1038,7 +1038,7 @@ export default function DetailPosyandu() {
               className="chart-container w-full mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg"
               span={24}
             >
-              <div className="w-full min-h-[300px] sm:min-h-[400px]">
+              <div className="w-full min-h-[500px] sm:min-h-[700px]">
                 <Line
                   data={
                     dataAnak.gender === "LAKI_LAKI"
@@ -1056,7 +1056,7 @@ export default function DetailPosyandu() {
               className="chart-container w-full mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg"
               span={24}
             >
-              <div className="w-full min-h-[300px] sm:min-h-[400px]">
+              <div className="w-full min-h-[500px] sm:min-h-[700px]">
                 <Line
                   data={
                     dataAnak.gender === "LAKI_LAKI"
@@ -1074,7 +1074,7 @@ export default function DetailPosyandu() {
               className="chart-container w-full mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg"
               span={24}
             >
-              <div className="w-full min-h-[300px] sm:min-h-[400px]">
+              <div className="w-full min-h-[500px] sm:min-h-[700px]">
                 <Line
                   data={
                     dataAnak.gender === "LAKI_LAKI"

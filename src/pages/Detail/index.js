@@ -855,7 +855,7 @@ export default function Detail() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -909,7 +909,7 @@ export default function Detail() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -963,7 +963,7 @@ export default function Detail() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 0,
@@ -1017,7 +1017,7 @@ export default function Detail() {
           font: { size: 14 },
         },
         ticks: {
-          maxTicksLimit: 10,
+          maxTicksLimit: 61,
           font: { size: 12 },
         },
         min: 45,
@@ -1270,7 +1270,7 @@ export default function Detail() {
 
         {activeContent === "Content 1" && (
           <div className="chart-container w-full max-w-[1200px] mt-6 sm:mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg">
-            <div className="w-full min-h-[300px] sm:min-h-[400px]">
+            <div className="w-full min-h-[300px] sm:min-h-[700px]">
               <Line
                 data={
                   dataAnak.gender === "LAKI_LAKI"
@@ -1285,7 +1285,7 @@ export default function Detail() {
 
         {activeContent === "Content 2" && (
           <div className="chart-container w-full max-w-[1200px] mt-6 sm:mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg">
-            <div className="w-full min-h-[300px] sm:min-h-[400px]">
+            <div className="w-full min-h-[300px] sm:min-h-[700px]">
               <Line
                 data={
                   dataAnak.gender === "LAKI_LAKI"
@@ -1300,7 +1300,7 @@ export default function Detail() {
 
         {activeContent === "Content 3" && (
           <div className="chart-container w-full max-w-[1200px] mt-6 sm:mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg">
-            <div className="w-full min-h-[300px] sm:min-h-[400px]">
+            <div className="w-full min-h-[300px] sm:min-h-[700px]">
               <Line
                 data={
                   dataAnak.gender === "LAKI_LAKI"
@@ -1315,7 +1315,7 @@ export default function Detail() {
 
         {activeContent === "Content 4" && (
           <div className="chart-container w-full max-w-[1200px] mt-6 sm:mt-8 p-2 sm:p-4 border-2 border-gray-300 rounded-lg">
-            <div className="w-full min-h-[300px] sm:min-h-[400px]">
+            <div className="w-full min-h-[300px] sm:min-h-[700px]">
               <Line
                 data={
                   dataAnak.gender === "LAKI_LAKI"
